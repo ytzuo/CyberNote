@@ -9,6 +9,13 @@ namespace CyberNote
     /// </summary>
     public partial class App : Application
     {
+        // App.xaml.cs
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            var window = new MainWindow();
+            window.Show();
+        }
     }
 
 }
