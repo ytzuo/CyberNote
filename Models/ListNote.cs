@@ -13,6 +13,7 @@ namespace CyberNote.Models
         public int Priority { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime Schedule { get; set; }
+        public DateTime createDate { get; set; }
         public List<TaskItem> Tasks { get; } = new();
 
         public ListNote(string type, int priority, string content, List<TaskItem> tasks)

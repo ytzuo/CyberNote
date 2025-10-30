@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace CyberNote.Models
 {
-    internal class CommomNote
+    internal class CommonNote
     {
         public string Type { get; set; } = string.Empty;
         public DateTime Schedule { get; set; }
+        public DateTime createDate { get; set; }
         public string Progress { get; set; } = "未完成";
         public int Priority { get; set; }
         public string Content { get; set; } = string.Empty;
         //无参构造函数
-        public CommomNote(){ }
+        public CommonNote(){ }
         //有参构造函数
-        public CommomNote(string type, DateTime schedule, int priority, string content)
+        public CommonNote(string type, DateTime schedule, int priority, string content)
         {
             Type = type;
             Schedule = schedule;

@@ -1,12 +1,50 @@
-﻿<UserControl x:Class="CyberNote.ThumbnailCard"
+﻿<!-- Views\ThumbnailCard.xaml -->
+<UserControl x:Class="CyberNote.Views.ThumbnailCard"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CyberNote"
+             xmlns:local="clr-namespace:CyberNote.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            <!-- 需要添加缩略图的内部: 显示日期和少量文本的文本框 -->
-    </Grid>
-</UserControl>
+             d:DesignHeight="120" d:DesignWidth="200">
+
+    <UserControl.Resources>
+        <!-- 截断字符串的转换器（推荐方式） -->
+        <local:TruncateConverter x:Key="TruncateConverter" MaxLength="7"/>
+
+        <!-- 类型转中文的转换器 -->
+        <local:NoteTypeToChineseConverter x:Key="TypeConverter"/>
+
+        <!-- 提供缺失的样式，避免 XAML 解析错误 -->
+        <Style x:Key="ThumbnailDateStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="#666666" />
+        </Style>
+
+        <Style x:Key="ThumbnailTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="#333333" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="White"
+            BorderBrush="#E0E0E0"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="12">
+        <Grid>
+            <StackPanel VerticalAlignment="Top">
+                <!-- 日期和类型并排 -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding CreateDate, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='{}{0:yyyy-MM-dd}'}"
+                               Style="{StaticResource ThumbnailDateStyle}"/>                    
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Type, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TypeConverter}}"
+                               HorizontalAlignment="Right"/>                </Grid>                <!-- 文本内容，使用转换器截断 -->                <TextBlock Text="{Binding Text0, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>                <TextBlock Text="{Binding Text1, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>                <TextBlock Text="{Binding Text2, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>                <TextBlock Text="{Binding Text3, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>            </StackPanel>        </Grid>    </Border></UserControl>
