@@ -5,8 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CyberNote.Converters"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
-             d:DesignHeight="120" d:DesignWidth="200">
+             d:DesignHeight="120" d:DesignWidth="200">  
 
     <UserControl.Resources>
         <!-- 截断字符串的转换器（推荐方式） -->
@@ -34,6 +35,12 @@
             BorderThickness="1"
             CornerRadius="8"
             Padding="12">
+        <!-- 绑定点击方法 -->
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseLeftButtonUp">
+                <i:InvokeCommandAction Command="{Binding OnClickCommand}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
         <Grid>
             <StackPanel VerticalAlignment="Top">
                 <!-- 日期和类型并排 -->
@@ -43,8 +50,24 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="{Binding CreateDate, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='{}{0:yyyy-MM-dd}'}"
-                               Style="{StaticResource ThumbnailDateStyle}"/>                    
+                               Text="{Binding CreateDate,StringFormat='{}{0:yyyy-MM-dd}'}"
+                               Style="{StaticResource ThumbnailDateStyle}"/>
+                    
                     <TextBlock Grid.Column="1"
-                               Text="{Binding Type, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TypeConverter}}"
-                               HorizontalAlignment="Right"/>                </Grid>                <!-- 文本内容，使用转换器截断 -->                <TextBlock Text="{Binding Text0, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>                <TextBlock Text="{Binding Text1, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>                <TextBlock Text="{Binding Text2, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>                <TextBlock Text="{Binding Text3, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource TruncateConverter}}"                           Style="{StaticResource ThumbnailTextStyle}"/>            </StackPanel>        </Grid>    </Border></UserControl>
+                               Text="{Binding Type, Converter={StaticResource TypeConverter}}"
+                               HorizontalAlignment="Right"/>
+                </Grid>
+
+                <!-- 文本内容，使用转换器截断 -->
+                <TextBlock Text="{Binding Text0, Converter={StaticResource TruncateConverter}}"
+                           Style="{StaticResource ThumbnailTextStyle}"/>
+                <TextBlock Text="{Binding Text1, Converter={StaticResource TruncateConverter}}"
+                           Style="{StaticResource ThumbnailTextStyle}"/>
+                <TextBlock Text="{Binding Text2, Converter={StaticResource TruncateConverter}}"
+                           Style="{StaticResource ThumbnailTextStyle}"/>
+                <TextBlock Text="{Binding Text3, Converter={StaticResource TruncateConverter}}"
+                           Style="{StaticResource ThumbnailTextStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

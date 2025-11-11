@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using CyberNote.ViewModels;
+using System.Windows;
 using System.Windows.Input;
 
 namespace CyberNote
@@ -8,9 +9,11 @@ namespace CyberNote
     /// </summary>
     public partial class MainWindow : Window
     {
+        //private MainWindowViewModel vm;
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainWindowViewModel();
             // 不再需要 SetToDesktop，使用 Topmost 实现组件效果
         }
 

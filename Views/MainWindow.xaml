@@ -1,6 +1,6 @@
 ﻿<Window x:Class="CyberNote.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:views="clr-namespace:CyberNote.Views"
         Title="CyberNote 桌面组件"
         Width="350"
         Height="250"
@@ -60,7 +60,28 @@
                     BorderBrush="#DDDDDD"
                     BorderThickness="3">
                     <ScrollViewer>
-                        <!-- 使用StackPanel包裹每一行的一到两个选项卡 -->
+                        <!-- 关键：ItemsControl 绑定到 ThumbnailCards -->
+                        <ItemsControl ItemsSource="{Binding ThumbnailCards}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <!-- 垂直堆叠卡片 -->
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- 将 ViewModel 字段绑定到 ThumbnailCard 的依赖属性 -->
+                                    <views:ThumbnailCard Margin="0,0,0,12"
+                                                         Type="{Binding Type}"
+                                                         CreateDate="{Binding CreateDate}"
+                                                         Text0="{Binding Text0}"
+                                                         Text1="{Binding Text1}"
+                                                         Text2="{Binding Text2}"
+                                                         Text3="{Binding Text3}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </ScrollViewer>
                 </Border>
 
