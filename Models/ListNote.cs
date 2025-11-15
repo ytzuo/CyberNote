@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace CyberNote.Models
 {
     //任务列表类
-    internal class ListNote
+    public class ListNote : NoteCard
     {
-        public string Type { get; set; } = string.Empty;
+        public string Type { get; } = "list";
         public int Priority { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime Schedule { get; set; }

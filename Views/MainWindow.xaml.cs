@@ -57,7 +57,7 @@ namespace CyberNote
 
         private void FloatingButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // TODO: 实现点击添加便签的逻辑
         }
     }
 }

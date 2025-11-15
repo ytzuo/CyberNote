@@ -19,6 +19,10 @@ namespace CyberNote.ViewModels
         public ICommand AddNewCardCommand { get; }
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /* 替换上方卡片 */
+        public ICommand ReplaceMainCard { get; }
+
+
         private void ExecuteAddNewCard()
         {
             var newCard = new ThumbnailCardViewModel
@@ -31,9 +35,16 @@ namespace CyberNote.ViewModels
             };
             ThumbnailCards.Add(newCard);
         }
+
+        private void ReplaceMainCardExecute(ThumbnailCardViewModel card)
+        {
+            // 将目前的主卡片重新添加到列表
+            // 将选择的卡片设为主卡片
+        }
         public MainWindowViewModel()
         {
             AddNewCardCommand = new RelayCommand(ExecuteAddNewCard);
+            ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ReplaceMainCardExecute);
 
             /* 初始化测试卡片 */
             ThumbnailCards.Add(new ThumbnailCardViewModel { 
