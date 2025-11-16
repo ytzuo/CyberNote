@@ -25,7 +25,6 @@
         <Style x:Key="ThumbnailTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14" />
             <Setter Property="Foreground" Value="#333333" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
     </UserControl.Resources>
@@ -58,15 +57,17 @@
                                HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- 第一行显示标题 -->
-                <TextBlock Text="{Binding Title, Converter={StaticResource TruncateConverter}}"
-                           Style="{StaticResource ThumbnailTextStyle}"/>
-                <TextBlock Text="{Binding Text1, Converter={StaticResource TruncateConverter}}"
-                           Style="{StaticResource ThumbnailTextStyle}"/>
-                <TextBlock Text="{Binding Text2, Converter={StaticResource TruncateConverter}}"
-                           Style="{StaticResource ThumbnailTextStyle}"/>
-                <TextBlock Text="{Binding Text3, Converter={StaticResource TruncateConverter}}"
-                           Style="{StaticResource ThumbnailTextStyle}"/>
+                <!-- 标题 -->
+                <TextBlock Text="{Binding Title}"
+                           Style="{StaticResource ThumbnailTextStyle}"
+                           FontWeight="SemiBold"
+                           TextTrimming="CharacterEllipsis"/>
+
+                <!-- 内容预览：限制显示高度约两行，超出使用裁剪并添加省略号（通过绑定预处理） -->
+                <TextBlock Text="{Binding ContentPreview}"
+                           Style="{StaticResource ThumbnailTextStyle}"
+                           TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis"/>
             </StackPanel>
         </Grid>
     </Border>

@@ -10,5 +10,6 @@ namespace CyberNote.Models
     {
         string Type { get; }
         string Title { get; set; }
+        string Content { get; set; }
     }
 }

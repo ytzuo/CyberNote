@@ -21,9 +21,7 @@ namespace CyberNote.ViewModels
         private string _type = "Common";
         private DateTime _createDate = DateTime.Now;
         private string _title = string.Empty;
-        private string _text1 = "";
-        private string _text2 = "";
-        private string _text3 = "";
+        private string _contentPreview = string.Empty;
 
         public string Type
         {
@@ -64,52 +62,55 @@ namespace CyberNote.ViewModels
             }
         }
 
-        public string Text1
+        // 多行内容预览（最多两行，超过显示省略号）
+        public string ContentPreview
         {
-            get => _text1;
-            set
+            get => _contentPreview;
+            private set
             {
-                if (_text1 != value)
+                if (_contentPreview != value)
                 {
-                    _text1 = value;
-                    OnPropertyChanged(nameof(Text1));
+                    _contentPreview = value;
+                    OnPropertyChanged(nameof(ContentPreview));
                 }
             }
         }
-
-        public string Text2
-        {
-            get => _text2;
-            set
-            {
-                if (_text2 != value)
-                {
-                    _text2 = value;
-                    OnPropertyChanged(nameof(Text2));
-                }
-            }
-        }
-
-        public string Text3
-        {
-            get => _text3;
-            set
-            {
-                if (_text3 != value)
-                {
-                    _text3 = value;
-                    OnPropertyChanged(nameof(Text3));
-                }
-            }
-        }
-
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        // 通用触发方法
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public ThumbnailCardViewModel() { }
+
+        public ThumbnailCardViewModel(NoteCard note)
+        {
+            Note = note;
+            Title = note.Title;
+            Type = note.Type;
+            CreateDate = (note as CommonNote)?.createDate != default ? (note as CommonNote)!.createDate : DateTime.Now;
+            BuildContentPreview();
+        }
+
+        public void BuildContentPreview()
+        {
+            var raw = Note?.Content ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                ContentPreview = string.Empty;
+                return;
+            }
+            var lines = raw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length <= 2)
+            {
+                ContentPreview = string.Join(Environment.NewLine, lines);
+            }
+            else
+            {
+                ContentPreview = string.Join(Environment.NewLine, lines.Take(2)) + "...";
+            }
         }
     }
 }

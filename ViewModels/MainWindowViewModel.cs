@@ -16,30 +16,23 @@ namespace CyberNote.ViewModels
 {
     internal class MainWindowViewModel : INotifyPropertyChanged
     {
-        /* 缩略图卡片列表 */
         public ObservableCollection<ThumbnailCardViewModel> ThumbnailCards { get; } = new ObservableCollection<ThumbnailCardViewModel>();
 
-        /* 添加新卡片 */
         public ICommand AddNewCardCommand { get; }
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        /* 替换上方卡片 */
         public ICommand ReplaceMainCard { get; }
-
 
         private void ExecuteAddNewCard()
         {
-            var newCard = new ThumbnailCardViewModel
+            var content = "点击编辑内容...\n第二行示例";
+            var note = new CommonNote("新笔记标题", DateTime.Now, 0, content) { createDate = DateTime.Now };
+            var newCard = new ThumbnailCardViewModel(note)
             {
-                Type = "Common",
-                CreateDate = DateTime.Now,
-                Title = "新笔记标题",
-                Text1 = "点击编辑内容...",
+                Type = note.Type,
+                CreateDate = note.createDate,
+                Title = note.Title,
             };
-            // 构造对应的 Note 模型，便于后续展示主卡片
-            var note = new CommonNote(newCard.Title, DateTime.Now, 0, newCard.Text1) { createDate = newCard.CreateDate };
-            newCard.Note = note;
-
+            newCard.BuildContentPreview();
             ThumbnailCards.Add(newCard);
             Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
         }
@@ -62,41 +55,56 @@ namespace CyberNote.ViewModels
             AddNewCardCommand = new RelayCommand(ExecuteAddNewCard);
             ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ReplaceMainCardExecute);
 
-            /* 初始化测试卡片 */
-            var c1 = new ThumbnailCardViewModel { 
-                Type = "Common",
-                CreateDate = DateTime.Now.AddDays(0),
-                Title = "示例笔记111111",
-                Text1 = "这是一个示例笔记的内容预览。",
-                Text2 = "更多内容 more detail",
-            };
-            c1.Note = new CommonNote(c1.Title, DateTime.Now, 0, c1.Text1) { createDate = c1.CreateDate };
+            // 初始化测试数据：普通笔记
+            var note1 = new CommonNote("示例笔记111111", DateTime.Now, 0, "这是一个示例笔记的内容预览。\n更多内容 more detail\n第三行隐藏") { createDate = DateTime.Now.AddDays(0) };
+            var c1 = new ThumbnailCardViewModel(note1) { Type = note1.Type, CreateDate = note1.createDate, Title = note1.Title };
+            c1.BuildContentPreview();
 
-            var l1 = new ThumbnailCardViewModel
+            // 初始化测试数据：任务列表（包含多任务，部分已完成）
+            var tasksA = new List<TaskItem>
             {
-                Type = "List",
-                CreateDate = DateTime.Now.AddDays(-1),
-                Title = "示例任务列表111111",
-                Text1 = "这是一个示例任务列表的内容预览。",
-                Text2 = "更多内容 more detail",
+                new TaskItem("编写接口文档"),
+                new TaskItem("实现登录功能") { Progress = true },
+                new TaskItem("编写单元测试"),
+                new TaskItem("修复已知 Bug") { Progress = true },
+                new TaskItem("整理发布说明"),
             };
-            l1.Note = new ListNote(l1.Title, 0, l1.Text1, new List<TaskItem>()) { createDate = l1.CreateDate };
+            var listContent1 = "项目开发任务列表\n包含后台与前端部分";
+            var noteList1 = new ListNote("示例任务列表111111", 0, listContent1, tasksA) { createDate = DateTime.Now.AddDays(-1) };
+            var l1 = new ThumbnailCardViewModel(noteList1) { Type = noteList1.Type, CreateDate = noteList1.createDate, Title = noteList1.Title };
+            l1.BuildContentPreview();
 
-            var l2 = new ThumbnailCardViewModel
+            // 另一组任务列表：全部未完成
+            var tasksB = new List<TaskItem>
             {
-                Type = "List",
-                CreateDate = DateTime.Now.AddDays(-2),
-                Title = "示例任务列表",
-                Text1 = "这是一个示例任务列表的内容预览。",
-                Text2 = "更多内容 more detail",
+                new TaskItem("阅读技术方案"),
+                new TaskItem("拆分开发子任务"),
+                new TaskItem("安排评审会议"),
             };
-            l2.Note = new ListNote(l2.Title, 0, l2.Text1, new List<TaskItem>()) { createDate = l2.CreateDate };
+            var listContent2 = "需求评审准备事项";
+            var noteList2 = new ListNote("示例任务列表", 0, listContent2, tasksB) { createDate = DateTime.Now.AddDays(-2) };
+            var l2 = new ThumbnailCardViewModel(noteList2) { Type = noteList2.Type, CreateDate = noteList2.createDate, Title = noteList2.Title };
+            l2.BuildContentPreview();
+
+            // 第三个任务列表：大量任务（测试滚动与样式）
+            var tasksC = new List<TaskItem>();
+            for (int i = 1; i <= 15; i++)
+            {
+                tasksC.Add(new TaskItem($"批量任务 #{i}"));
+            }
+            tasksC[3].Progress = true;
+            tasksC[7].Progress = true;
+            tasksC[10].Progress = true;
+            var listContent3 = "批量导入测试任务";
+            var noteList3 = new ListNote("批量任务列表", 0, listContent3, tasksC) { createDate = DateTime.Now.AddDays(-3) };
+            var l3 = new ThumbnailCardViewModel(noteList3) { Type = noteList3.Type, CreateDate = noteList3.createDate, Title = noteList3.Title };
+            l3.BuildContentPreview();
 
             ThumbnailCards.Add(c1);
             ThumbnailCards.Add(l1);
             ThumbnailCards.Add(l2);
+            ThumbnailCards.Add(l3);
 
-            // 启动时选出日期最靠后的记录并显示为主卡片
             var latest = ThumbnailCards.OrderByDescending(x => x.CreateDate).FirstOrDefault();
             if (latest?.Note != null)
             {

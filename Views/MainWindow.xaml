@@ -106,9 +106,7 @@
                                             Type="{Binding Type}"
                                             CreateDate="{Binding CreateDate}"
                                             Title="{Binding Title}"
-                                            Text1="{Binding Text1}"
-                                            Text2="{Binding Text2}"
-                                            Text3="{Binding Text3}" />
+                                            ContentPreview="{Binding ContentPreview}" />
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

@@ -25,7 +25,7 @@ namespace CyberNote.Views
                 typeof(ThumbnailCard),
                 new PropertyMetadata(DateTime.Now));
 
-        // 依赖属性：标题（替代 Text0）
+        // 依赖属性：标题
         public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register(
                 nameof(Title),
@@ -33,26 +33,10 @@ namespace CyberNote.Views
                 typeof(ThumbnailCard),
                 new PropertyMetadata(""));
 
-        // 依赖属性：文本行1
-        public static readonly DependencyProperty Text1Property =
+        // 依赖属性：内容预览（最多两行）
+        public static readonly DependencyProperty ContentPreviewProperty =
             DependencyProperty.Register(
-                nameof(Text1),
-                typeof(string),
-                typeof(ThumbnailCard),
-                new PropertyMetadata(""));
-
-        // 依赖属性：文本行2
-        public static readonly DependencyProperty Text2Property =
-            DependencyProperty.Register(
-                nameof(Text2),
-                typeof(string),
-                typeof(ThumbnailCard),
-                new PropertyMetadata(""));
-
-        // 依赖属性：文本行3
-        public static readonly DependencyProperty Text3Property =
-            DependencyProperty.Register(
-                nameof(Text3),
+                nameof(ContentPreview),
                 typeof(string),
                 typeof(ThumbnailCard),
                 new PropertyMetadata(""));
@@ -76,33 +60,10 @@ namespace CyberNote.Views
             set { SetValue(TitleProperty, value); }
         }
 
-        public string Text1
+        public string ContentPreview
         {
-            get { return (string)GetValue(Text1Property); }
-            set { SetValue(Text1Property, value); }
-        }
-
-        public string Text2
-        {
-            get { return (string)GetValue(Text2Property); }
-            set { SetValue(Text2Property, value); }
-        }
-
-        public string Text3
-        {
-            get { return (string)GetValue(Text3Property); }
-            set { SetValue(Text3Property, value); }
-        }
-
-        // 静态资源，用于截断字符串（可选：也可在 ViewModel 中处理）
-        public static string TruncateString(string input, int maxLength = 7)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            return input.Length > maxLength
-                ? input.Substring(0, maxLength) + "..."
-                : input;
+            get { return (string)GetValue(ContentPreviewProperty); }
+            set { SetValue(ContentPreviewProperty, value); }
         }
 
         public ThumbnailCard()

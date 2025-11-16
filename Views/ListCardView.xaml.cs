@@ -29,6 +29,7 @@ namespace CyberNote.Views
         public ListCardView(ListNote note)
         {
             InitializeComponent();
+            DataContext = note ?? throw new ArgumentNullException(nameof(note));
         }
     }
 }
