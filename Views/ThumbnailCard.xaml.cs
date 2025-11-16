@@ -25,10 +25,10 @@ namespace CyberNote.Views
                 typeof(ThumbnailCard),
                 new PropertyMetadata(DateTime.Now));
 
-        // 依赖属性：文本行0（标题）
-        public static readonly DependencyProperty Text0Property =
+        // 依赖属性：标题（替代 Text0）
+        public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register(
-                nameof(Text0),
+                nameof(Title),
                 typeof(string),
                 typeof(ThumbnailCard),
                 new PropertyMetadata(""));
@@ -70,10 +70,10 @@ namespace CyberNote.Views
             set { SetValue(CreateDateProperty, value); }
         }
 
-        public string Text0
+        public string Title
         {
-            get { return (string)GetValue(Text0Property); }
-            set { SetValue(Text0Property, value); }
+            get { return (string)GetValue(TitleProperty); }
+            set { SetValue(TitleProperty, value); }
         }
 
         public string Text1

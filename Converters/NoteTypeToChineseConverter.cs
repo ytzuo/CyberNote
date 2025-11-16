@@ -12,9 +12,8 @@ namespace CyberNote.Converters
             if (value == null) return string.Empty;
             switch (value.ToString())
             {
-                case "Personal": return "个人";
-                case "Work": return "工作";
-                case "Study": return "学习";
+                case "Common": return "随手记";
+                case "List": return "任务列表";
                 default: return "其他";
             }
         }

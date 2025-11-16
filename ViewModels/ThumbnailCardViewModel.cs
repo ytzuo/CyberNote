@@ -1,4 +1,6 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿using CyberNote.Models;
+using CyberNote.Utils;
+using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,9 +15,12 @@ namespace CyberNote.ViewModels
 {
     class ThumbnailCardViewModel : INotifyPropertyChanged
     {
+        // 完整数据模型
+        public NoteCard? Note { get; set; }
+
         private string _type = "Common";
         private DateTime _createDate = DateTime.Now;
-        private string _text0 = "";
+        private string _title = string.Empty;
         private string _text1 = "";
         private string _text2 = "";
         private string _text3 = "";
@@ -46,15 +51,15 @@ namespace CyberNote.ViewModels
             }
         }
 
-        public string Text0
+        public string Title
         {
-            get => _text0;
+            get => _title;
             set
             {
-                if (_text0 != value)
+                if (_title != value)
                 {
-                    _text0 = value;
-                    OnPropertyChanged(nameof(Text0));
+                    _title = value;
+                    OnPropertyChanged(nameof(Title));
                 }
             }
         }
@@ -98,19 +103,6 @@ namespace CyberNote.ViewModels
             }
         }
 
-        public ICommand OnClickCommand { get; }
-
-        public ThumbnailCardViewModel()
-        {
-            OnClickCommand = new RelayCommand(ExecuteOnClick);
-        }
-
-        private void ExecuteOnClick()
-        {
-            // 在这里实现点击卡片时的逻辑
-            // 切换主视图中显示的卡片, 将本卡片的信息传递给主视图模型
-            // 再将本卡片从下方列表中移除, 等到被关闭时再添加回去
-        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

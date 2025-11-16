@@ -8,7 +8,8 @@ namespace CyberNote.Models
 {
     public class CommonNote : NoteCard
     {
-        public string Type { get; } = "common";
+        public string Type { get; } = "Common";
+        public string Title { get; set; } = "无标题";
         public DateTime Schedule { get; set; }
         public DateTime createDate { get; set; }
         public string Progress { get; set; } = "未完成";
@@ -18,8 +19,9 @@ namespace CyberNote.Models
         //无参构造函数
         public CommonNote(){ }
         //有参构造函数
-        public CommonNote(DateTime schedule, int priority, string content)
+        public CommonNote(string T, DateTime schedule, int priority, string content)
         {
+            Title = T;
             Schedule = schedule;
             Priority = priority;
             Content = content;

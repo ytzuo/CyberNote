@@ -1,12 +1,16 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CyberNote.Utils;
+using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using CyberNote.Models;
 
 namespace CyberNote.ViewModels
 {
@@ -29,47 +33,75 @@ namespace CyberNote.ViewModels
             {
                 Type = "Common",
                 CreateDate = DateTime.Now,
-                Text0 = "新笔记标题",
+                Title = "新笔记标题",
                 Text1 = "点击编辑内容...",
-                // 其他字段可选
             };
+            // 构造对应的 Note 模型，便于后续展示主卡片
+            var note = new CommonNote(newCard.Title, DateTime.Now, 0, newCard.Text1) { createDate = newCard.CreateDate };
+            newCard.Note = note;
+
             ThumbnailCards.Add(newCard);
+            Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
         }
 
-        private void ReplaceMainCardExecute(ThumbnailCardViewModel card)
+        private FrameworkElement? _mainCardElement;
+        public FrameworkElement? MainCardElement
         {
-            // 将目前的主卡片重新添加到列表
-            // 将选择的卡片设为主卡片
+            get => _mainCardElement;
+            set { _mainCardElement = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MainCardElement))); }
         }
+        private void ReplaceMainCardExecute(ThumbnailCardViewModel vm)
+        {
+            Debug.WriteLine($"ReplaceMainCard executed: Title={vm?.Title}, Type={vm?.Type}");
+            if (vm?.Note == null) return;
+            MainCardElement = MainCardFactory.Create(vm.Note);
+        }
+
         public MainWindowViewModel()
         {
             AddNewCardCommand = new RelayCommand(ExecuteAddNewCard);
             ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ReplaceMainCardExecute);
 
             /* 初始化测试卡片 */
-            ThumbnailCards.Add(new ThumbnailCardViewModel { 
+            var c1 = new ThumbnailCardViewModel { 
                 Type = "Common",
                 CreateDate = DateTime.Now.AddDays(0),
-                Text0 = "示例笔记111111",
+                Title = "示例笔记111111",
                 Text1 = "这是一个示例笔记的内容预览。",
                 Text2 = "更多内容 more detail",
-            });
-            ThumbnailCards.Add(new ThumbnailCardViewModel
+            };
+            c1.Note = new CommonNote(c1.Title, DateTime.Now, 0, c1.Text1) { createDate = c1.CreateDate };
+
+            var l1 = new ThumbnailCardViewModel
             {
-                Type = "ListNode",
+                Type = "List",
                 CreateDate = DateTime.Now.AddDays(-1),
-                Text0 = "示例任务列表111111",
+                Title = "示例任务列表111111",
                 Text1 = "这是一个示例任务列表的内容预览。",
                 Text2 = "更多内容 more detail",
-            });
-            ThumbnailCards.Add(new ThumbnailCardViewModel
+            };
+            l1.Note = new ListNote(l1.Title, 0, l1.Text1, new List<TaskItem>()) { createDate = l1.CreateDate };
+
+            var l2 = new ThumbnailCardViewModel
             {
-                Type = "ListNode",
+                Type = "List",
                 CreateDate = DateTime.Now.AddDays(-2),
-                Text0 = "示例任务列表",
+                Title = "示例任务列表",
                 Text1 = "这是一个示例任务列表的内容预览。",
                 Text2 = "更多内容 more detail",
-            });
+            };
+            l2.Note = new ListNote(l2.Title, 0, l2.Text1, new List<TaskItem>()) { createDate = l2.CreateDate };
+
+            ThumbnailCards.Add(c1);
+            ThumbnailCards.Add(l1);
+            ThumbnailCards.Add(l2);
+
+            // 启动时选出日期最靠后的记录并显示为主卡片
+            var latest = ThumbnailCards.OrderByDescending(x => x.CreateDate).FirstOrDefault();
+            if (latest?.Note != null)
+            {
+                MainCardElement = MainCardFactory.Create(latest.Note);
+            }
         }
     }
 }

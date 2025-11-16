@@ -58,8 +58,8 @@
                                HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- 文本内容，使用转换器截断 -->
-                <TextBlock Text="{Binding Text0, Converter={StaticResource TruncateConverter}}"
+                <!-- 第一行显示标题 -->
+                <TextBlock Text="{Binding Title, Converter={StaticResource TruncateConverter}}"
                            Style="{StaticResource ThumbnailTextStyle}"/>
                 <TextBlock Text="{Binding Text1, Converter={StaticResource TruncateConverter}}"
                            Style="{StaticResource ThumbnailTextStyle}"/>

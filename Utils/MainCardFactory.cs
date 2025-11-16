@@ -13,7 +13,7 @@ namespace CyberNote.Utils
     internal static class MainCardFactory
     {
         private static readonly Dictionary<string, Func<NoteCard, object>> _creators =
-            new Dictionary<string, Func<NoteCard, object>>
+            new Dictionary<string, Func<NoteCard, object>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["common"] = data => new CommonCardView((CommonNote)data),
                 ["list"] = data => new ListCardView((ListNote)data)
@@ -23,7 +23,8 @@ namespace CyberNote.Utils
         public static FrameworkElement Create(NoteCard note)
         {
             if (note is null) throw new ArgumentNullException(nameof(note));
-            if (_creators.TryGetValue(note.Type, out var builder))
+            var key = note.Type?.ToLowerInvariant() ?? string.Empty;
+            if (_creators.TryGetValue(key, out var builder))
                 return (FrameworkElement)builder(note);
             throw new InvalidOperationException($"未注册的卡片类型：{note.Type}");
         }

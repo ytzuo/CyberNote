@@ -9,16 +9,17 @@ namespace CyberNote.Models
     //任务列表类
     public class ListNote : NoteCard
     {
-        public string Type { get; } = "list";
+        public string Type { get; } = "List";
+        public string Title { get; set; } = "无标题";
         public int Priority { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime Schedule { get; set; }
         public DateTime createDate { get; set; }
-        public List<TaskItem> Tasks { get; } = new();
+        public List<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 
-        public ListNote(string type, int priority, string content, List<TaskItem> tasks)
+        public ListNote(string T, int priority, string content, List<TaskItem> tasks)
         {
-            Type = type;
+            Title = T;
             Priority = priority;
             Content = content;
 
@@ -49,7 +50,7 @@ namespace CyberNote.Models
 
 
     //任务项类
-    internal class TaskItem
+    public class TaskItem
     {
         public DateTime Schedule { get; set; }
         public string Progress { get; set; } = "未完成";

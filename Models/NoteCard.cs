@@ -9,5 +9,6 @@ namespace CyberNote.Models
     interface NoteCard
     {
         string Type { get; }
+        string Title { get; set; }
     }
 }

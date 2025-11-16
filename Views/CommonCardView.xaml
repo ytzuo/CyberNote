@@ -3,10 +3,52 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CyberNote.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             d:DesignHeight="240" d:DesignWidth="320">
+    <Border Background="White" Padding="12" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 顶部：标题 -->
+            <TextBlock Grid.Row="0"
+                       Text="{Binding Title}"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="#2C3E50"
+                       TextTrimming="CharacterEllipsis"/>
+
+            <!-- 中间：正文，支持上下滚动 -->
+            <ScrollViewer Grid.Row="1"
+                          Margin="0,8,0,8"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <TextBlock Text="{Binding Content}"
+                           TextWrapping="Wrap"
+                           Foreground="#333333"
+                           FontSize="14"/>
+            </ScrollViewer>
+
+            <!-- 底部：创建日期与完成状态 -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding createDate, StringFormat='{}{0:yyyy-MM-dd}'}"
+                           Foreground="#666666"
+                           FontSize="12"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Progress}"
+                           Foreground="#666666"
+                           FontSize="12"/>
+            </Grid>
+        </Grid>
+    </Border>
 </UserControl>

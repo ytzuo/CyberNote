@@ -26,28 +26,19 @@
               Margin="5,15,5,0"
               x:Name="ContentGrid">
             <Grid.RowDefinitions>
-                <RowDefinition Height="97*" />
-                <RowDefinition Height="20" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- 将原来的 StackPanel 替换为 ContentControl，保持原始显示 -->
+            <!-- 主卡片充满可用空间 -->
             <ContentControl x:Name="HeaderContent"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Margin="0,91,0,0"
-                            Grid.Row="0">
-                <StackPanel>
-                    <TextBlock Text="CyberNote" 
-                               FontSize="18" 
-                               FontWeight="SemiBold" 
-                               Foreground="#2C3E50"/>
-                    <TextBlock Text="仅点击边框可拖动" 
-                               FontSize="12" 
-                               Foreground="#7F8C8D"/>
-                </StackPanel>
-            </ContentControl>
+                            Grid.Row="0"
+                            Margin="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Content="{Binding MainCardElement}"/>
 
-            <Button Grid.Row="2"
+            <Button Grid.Row="1"
                     Content="底部按钮" 
                     Height="20"
                     Click="ExtendBtn_Clicked"
@@ -68,6 +59,28 @@
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
                         <!-- 关键：ItemsControl 绑定到 ThumbnailCards -->
                         <ItemsControl ItemsSource="{Binding ThumbnailCards}">
+                            <ItemsControl.Resources>
+                                <!-- 无边框的卡片按钮样式 -->
+                                <Style x:Key="CardButtonStyle" TargetType="Button">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <ContentPresenter 
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ItemsControl.Resources>
+
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <!-- 每行固定两个 -->
@@ -85,12 +98,14 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button
-                                        Command="{Binding DataContext.}">
+                                        Style="{StaticResource CardButtonStyle}"
+                                        Command="{Binding DataContext.ReplaceMainCard, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}">
                                         <!-- 去掉控件自身的 Margin，避免与容器 Margin 叠加 -->
                                         <views:ThumbnailCard
                                             Type="{Binding Type}"
                                             CreateDate="{Binding CreateDate}"
-                                            Text0="{Binding Text0}"
+                                            Title="{Binding Title}"
                                             Text1="{Binding Text1}"
                                             Text2="{Binding Text2}"
                                             Text3="{Binding Text3}" />
