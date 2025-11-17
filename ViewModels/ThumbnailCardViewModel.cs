@@ -22,6 +22,7 @@ namespace CyberNote.ViewModels
         private DateTime _createDate = DateTime.Now;
         private string _title = string.Empty;
         private string _contentPreview = string.Empty;
+        private bool _isActive; // 是否当前主卡片
 
         public string Type
         {
@@ -76,6 +77,35 @@ namespace CyberNote.ViewModels
             }
         }
 
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (_isActive != value)
+                {
+                    _isActive = value;
+                    OnPropertyChanged(nameof(IsActive));
+                }
+            }
+        }
+
+        // 列表任务完成状态文本（仅当类型为 List 时显示）
+        public string ListCompletionText
+        {
+            get
+            {
+                if (Note is ListNote ln)
+                {
+                    var total = ln.Tasks.Count;
+                    if (total == 0) return "无任务";
+                    var completed = ln.Tasks.Count(t => t.Progress);
+                    return completed == total ? "已全部完成" : $"剩余 {total - completed} 项";
+                }
+                return string.Empty;
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -91,7 +121,29 @@ namespace CyberNote.ViewModels
             Title = note.Title;
             Type = note.Type;
             CreateDate = (note as CommonNote)?.createDate != default ? (note as CommonNote)!.createDate : DateTime.Now;
+            WireTaskEvents();
             BuildContentPreview();
+        }
+
+        private void WireTaskEvents()
+        {
+            if (Note is ListNote ln)
+            {
+                foreach (var t in ln.Tasks)
+                {
+                    t.PropertyChanged += Task_PropertyChanged;
+                }
+                // 若后续支持动态增删，可再订阅 ln.Tasks.CollectionChanged
+            }
+        }
+
+        private void Task_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(TaskItem.Progress))
+            {
+                // 任务完成状态变化时刷新完成文本
+                OnPropertyChanged(nameof(ListCompletionText));
+            }
         }
 
         public void BuildContentPreview()
@@ -103,14 +155,7 @@ namespace CyberNote.ViewModels
                 return;
             }
             var lines = raw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            if (lines.Length <= 2)
-            {
-                ContentPreview = string.Join(Environment.NewLine, lines);
-            }
-            else
-            {
-                ContentPreview = string.Join(Environment.NewLine, lines.Take(2)) + "...";
-            }
+            ContentPreview = lines.Length <= 2 ? string.Join(Environment.NewLine, lines) : string.Join(Environment.NewLine, lines.Take(2)) + "...";
         }
     }
 }

@@ -7,133 +7,110 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="Transparent"
+        AllowsTransparency="True"
         Topmost="True"
         ShowInTaskbar="False"
         x:Name="MainWin"
         LocationChanged="Window_LocationChanged">
 
+    <Window.Resources>
+        <!-- 无边框平滑按钮样式 -->
+        <Style x:Key="FlatButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFE8F5E9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FFC8E6C9"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#999"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 供缩略卡片按钮使用的无边框样式放到 Window.Resources，确保 DataTemplate 可解析 -->
+        <Style x:Key="CardButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- 使用圆角裁剪整个窗口区域，避免外部黑色阴影 -->
     <Grid>
-        <!-- 拖动边框 -->
-        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                BorderThickness="10" 
-                BorderBrush="#DDDDDD"     
-                Background="#FFFFFF"
-                MouseLeftButtonDown="DragBorder_MouseLeftButtonDown"/>
-
-        <!-- 主内容区域 -->
-        <Grid Grid.Row="1" Grid.Column="1"
-              Background="White"         
-              Margin="5,15,5,0"
-              x:Name="ContentGrid">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <!-- 主卡片充满可用空间 -->
-            <ContentControl x:Name="HeaderContent"
-                            Grid.Row="0"
-                            Margin="0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Content="{Binding MainCardElement}"/>
-
-            <Button Grid.Row="1"
-                    Content="底部按钮" 
-                    Height="20"
-                    Click="ExtendBtn_Clicked"
-                    x:Name="ExpendBtn"/>
-        </Grid>
+        <Grid.Clip>
+            <RectangleGeometry RadiusX="12" RadiusY="12" Rect="0,0,350,250" />
+        </Grid.Clip>
+        <Border CornerRadius="12" BorderThickness="2" BorderBrush="#DDDDDD" Background="#FFFFFF" Padding="8" MouseLeftButtonDown="DragBorder_MouseLeftButtonDown" SnapsToDevicePixels="True" ClipToBounds="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ContentControl x:Name="HeaderContent" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding MainCardElement}"/>
+                <Button Grid.Row="1" Content="选择卡片" Height="20" Style="{StaticResource FlatButton}" Click="ExtendBtn_Clicked" x:Name="ExpendBtn"/>
+            </Grid>
+        </Border>
 
         <!-- ✅ 用 Popup 实现“外部更宽面板” -->
-        <Popup x:Name="WidePopup"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=ExpendBtn}"
-               VerticalOffset="5"  
-               StaysOpen="True"
-               IsOpen="False">
-            <Grid Width="450" Height="Auto">
-                <Border Background="White"
-                    BorderBrush="#DDDDDD"
-                    BorderThickness="3">
-                    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-                        <!-- 关键：ItemsControl 绑定到 ThumbnailCards -->
+        <Popup x:Name="WidePopup" Placement="Bottom" PlacementTarget="{Binding ElementName=ExpendBtn}" VerticalOffset="5" StaysOpen="True" IsOpen="False" AllowsTransparency="True">
+            <Border Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True">
+                <Grid>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl ItemsSource="{Binding ThumbnailCards}">
-                            <ItemsControl.Resources>
-                                <!-- 无边框的卡片按钮样式 -->
-                                <Style x:Key="CardButtonStyle" TargetType="Button">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="BorderBrush" Value="Transparent"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Padding" Value="0"/>
-                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <ContentPresenter 
-                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ItemsControl.Resources>
-
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <!-- 每行固定两个 -->
+                                    <!-- 每行两个缩略卡片 -->
                                     <UniformGrid Columns="2" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-
-                            <!-- 统一设置每个单元格的间距 -->
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="ContentPresenter">
                                     <Setter Property="Margin" Value="8"/>
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
-
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Button
-                                        Style="{StaticResource CardButtonStyle}"
-                                        Command="{Binding DataContext.ReplaceMainCard, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                        CommandParameter="{Binding}">
-                                        <!-- 去掉控件自身的 Margin，避免与容器 Margin 叠加 -->
-                                        <views:ThumbnailCard
-                                            Type="{Binding Type}"
-                                            CreateDate="{Binding CreateDate}"
-                                            Title="{Binding Title}"
-                                            ContentPreview="{Binding ContentPreview}" />
+                                    <Button Style="{StaticResource CardButtonStyle}" Command="{Binding DataContext.ReplaceMainCard, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}">
+                                        <views:ThumbnailCard Type="{Binding Type}" CreateDate="{Binding CreateDate}" Title="{Binding Title}" ContentPreview="{Binding ContentPreview}" />
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
-                </Border>
-
-                <!-- ✅ 悬浮按钮：靠右下角 -->
-                <Border Background="#FF2196F3"
-                    Width="40"
-                    Height="40"
-                    CornerRadius="20"
-                    MouseLeftButtonDown="FloatingButton_Click"
-
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    Margin="0,0,16,16"
-                    Panel.ZIndex="1">
-                    <TextBlock Text="＋"
-                        FontSize="18"
-                        FontWeight="Bold"
-                        Foreground="White"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Panel.ZIndex="1"/>
-                </Border>
-            </Grid>
+                    <!-- 悬浮新增按钮 -->
+                    <Border Background="#4CAF50" Width="40" Height="40" CornerRadius="20" MouseLeftButtonDown="FloatingButton_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,8" Panel.ZIndex="1">
+                        <TextBlock Text="＋" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
         </Popup>
     </Grid>
 </Window>

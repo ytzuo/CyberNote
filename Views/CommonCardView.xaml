@@ -32,20 +32,14 @@
                            FontSize="14"/>
             </ScrollViewer>
 
-            <!-- 底部：创建日期与完成状态 -->
+            <!-- 底部仅显示创建日期，移除完成状态 -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
                            Text="{Binding createDate, StringFormat='{}{0:yyyy-MM-dd}'}"
-                           Foreground="#666666"
-                           FontSize="12"/>
-
-                <TextBlock Grid.Column="1"
-                           Text="{Binding Progress}"
                            Foreground="#666666"
                            FontSize="12"/>
             </Grid>

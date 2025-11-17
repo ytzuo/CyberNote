@@ -34,6 +34,7 @@ namespace CyberNote.ViewModels
             };
             newCard.BuildContentPreview();
             ThumbnailCards.Add(newCard);
+            SetActiveCard(newCard);
             Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
         }
 
@@ -45,9 +46,15 @@ namespace CyberNote.ViewModels
         }
         private void ReplaceMainCardExecute(ThumbnailCardViewModel vm)
         {
-            Debug.WriteLine($"ReplaceMainCard executed: Title={vm?.Title}, Type={vm?.Type}");
             if (vm?.Note == null) return;
             MainCardElement = MainCardFactory.Create(vm.Note);
+            SetActiveCard(vm);
+        }
+
+        private void SetActiveCard(ThumbnailCardViewModel active)
+        {
+            foreach (var card in ThumbnailCards)
+                card.IsActive = card == active;
         }
 
         public MainWindowViewModel()
@@ -109,6 +116,7 @@ namespace CyberNote.ViewModels
             if (latest?.Note != null)
             {
                 MainCardElement = MainCardFactory.Create(latest.Note);
+                SetActiveCard(latest);
             }
         }
     }

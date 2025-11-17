@@ -4,5 +4,75 @@
              xmlns:local="clr-namespace:CyberNote"
              xmlns:converters="clr-namespace:CyberNote.Converters">
     <Application.Resources>
+        <!-- 细窄滚动条样式（稍微更明显） -->
+        <Style TargetType="ScrollBar" x:Key="ThinScrollBar">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#909090"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid>
+                            <Border Background="#08000000" CornerRadius="4"/>
+                            <Track x:Name="PART_Track" IsDirectionReversed="True" Focusable="False">
+                                <Track.Thumb>
+                                    <Thumb Background="#B0B0B0" Opacity="0.85">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="ThumbBorder" Background="{TemplateBinding Background}" CornerRadius="4"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb" BasedOn="{StaticResource {x:Type Thumb}}">
+                                                <Setter Property="Background" Value="#B0B0B0"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#888888"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter Property="Background" Value="#666666"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 全局 ScrollViewer 样式: 使用双列布局避免内容被覆盖；无滚动条时去掉右侧内容内边距统一勾选框位置 -->
+        <Style TargetType="ScrollViewer" x:Key="GlobalScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0" Margin="0,0,4,0"/>
+                            <ScrollBar Grid.Column="1" Name="PART_VerticalScrollBar"
+                                       Orientation="Vertical"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                       Style="{StaticResource ThinScrollBar}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ComputedVerticalScrollBarVisibility" Value="Collapsed">
+                                <Setter TargetName="PART_ScrollContentPresenter" Property="Margin" Value="0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 应用全局样式 -->
+        <Style TargetType="ScrollViewer" BasedOn="{StaticResource GlobalScrollViewer}"/>
     </Application.Resources>
 </Application>
