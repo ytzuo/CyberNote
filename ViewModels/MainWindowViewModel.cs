@@ -1,5 +1,4 @@
-﻿using CyberNote.Utils;
-using GalaSoft.MvvmLight.CommandWpf;
+﻿using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using CyberNote.Models;
+using CyberNote.UI;
 
 namespace CyberNote.ViewModels
 {

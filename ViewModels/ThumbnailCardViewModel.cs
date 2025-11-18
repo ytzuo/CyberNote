@@ -1,15 +1,18 @@
 ﻿using CyberNote.Models;
-using CyberNote.Utils;
+using CyberNote.Services;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Printing.IndexedProperties;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Diagnostics;
+
 
 namespace CyberNote.ViewModels
 {
@@ -121,8 +124,18 @@ namespace CyberNote.ViewModels
             Title = note.Title;
             Type = note.Type;
             CreateDate = (note as CommonNote)?.createDate != default ? (note as CommonNote)!.createDate : DateTime.Now;
+            
             WireTaskEvents();
             BuildContentPreview();
+            Debug.WriteLine("这里是测试内容");
+            Debug.WriteLine(JsonReader.GetNote(
+             @"C:\Users\Redmi\source\repos\ytzuo\CyberNote\Data\test_json.json", "今日待办", "Tasks"));
+            var tasks = JsonReader.GetTask(@"C:\Users\Redmi\source\repos\ytzuo\CyberNote\Data\test_json.json", "今日待办");
+            if (tasks == null) return;
+
+            foreach (var (content, progress) in tasks)
+                Debug.WriteLine($"Content={content}, Progress={progress}");
+
         }
 
         private void WireTaskEvents()

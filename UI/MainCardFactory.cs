@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace CyberNote.Utils
+namespace CyberNote.UI
 {
     /* 根据一个缩略选项卡创建一个主卡片的工厂 */
     internal static class MainCardFactory

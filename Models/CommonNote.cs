@@ -12,7 +12,7 @@ namespace CyberNote.Models
         public string Title { get; set; } = "无标题";
         public DateTime Schedule { get; set; }
         public DateTime createDate { get; set; }
-        public string Progress { get; set; } = "未完成";
+        public bool Progress { get; set; } = false;
         public int Priority { get; set; }
         public string Content { get; set; } = string.Empty;
 
@@ -25,26 +25,22 @@ namespace CyberNote.Models
             Schedule = schedule;
             Priority = priority;
             Content = content;
-            Progress = "未完成"; // 默认状态
+            Progress = false; // 默认状态
         }
         //切换完成情况
         public void shift_progress()
         {
-            if (Progress == "未完成")
+            if (Progress)
             {
-                Progress = "进行中";
+                Progress = false;
             }
-            else if (Progress == "进行中")
+            else 
             {
-                Progress = "已完成";
+                Progress = true;
             }
           
         }
-        //重置完成情况
-        public void reset_progress()
-        {
-            Progress = "未完成";
-        }
+
         //修改优先级
         public void shift_priority(int new_priority)
         {
