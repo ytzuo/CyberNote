@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Printing.IndexedProperties;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -127,15 +126,30 @@ namespace CyberNote.ViewModels
             
             WireTaskEvents();
             BuildContentPreview();
-            Debug.WriteLine("这里是测试内容");
-            Debug.WriteLine(JsonReader.GetNote(
-             @"C:\Users\Redmi\source\repos\ytzuo\CyberNote\Data\test_json.json", "今日待办", "Tasks"));
-            var tasks = JsonReader.GetTask(@"C:\Users\Redmi\source\repos\ytzuo\CyberNote\Data\test_json.json", "今日待办");
-            if (tasks == null) return;
+            DumpTestData();
+        }
 
-            foreach (var (content, progress) in tasks)
-                Debug.WriteLine($"Content={content}, Progress={progress}");
-
+        private void DumpTestData()
+        {
+            Debug.WriteLine("=== 测试：加载卡片数据 ===");
+            var notes = JsonReader.LoadAllCard("C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json");
+            foreach (var n in notes)
+            {
+                if (n is CommonNote cn)
+                {
+                    Debug.WriteLine($"[Common] Title={cn.Title} createDate={cn.createDate:yyyy-MM-dd HH:mm:ss} Priority={cn.Priority} Content={cn.Content}");
+                }
+                else if (n is ListNote ln)
+                {
+                    Debug.WriteLine($"[List] Title={ln.Title} createDate={ln.createDate:yyyy-MM-dd HH:mm:ss} Priority={ln.Priority} Tasks={ln.Tasks.Count} Content={ln.Content}");
+                    int idx = 1;
+                    foreach (var t in ln.Tasks)
+                    {
+                        Debug.WriteLine($"   - Task#{idx++}: Progress={(t.Progress ? "完成" : "未完成")}, Content={t.Content}");
+                    }
+                }
+            }
+            Debug.WriteLine("=== 结束 ===");
         }
 
         private void WireTaskEvents()

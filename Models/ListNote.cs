@@ -17,8 +17,8 @@ namespace CyberNote.Models
         private DateTime _schedule;
         public DateTime createDate { get; set; }
 
-        // 使用 ObservableCollection 支持 UI 动态增删
-        public ObservableCollection<TaskItem> Tasks { get; } = new();
+        // 公开 setter 供反序列化填充
+        public ObservableCollection<TaskItem> Tasks { get; set; } = new();
 
         public string Title
         {
@@ -48,22 +48,13 @@ namespace CyberNote.Models
             Title = T;
             Priority = priority;
             Content = content;
-
+            Tasks = new ObservableCollection<TaskItem>();
             foreach (var t in tasks)
             {
                 t.Owner = this;
                 Tasks.Add(t);
             }
-            //Tasks.CollectionChanged += (s, e) => RefreshSchedule();
-            //RefreshSchedule();
         }
-
-        //internal void RefreshSchedule()
-        //{
-        //    var next = Tasks.FirstOrDefault(t => t.Progress == false);
-        //    if (next != null)
-        //        Schedule = next.Schedule;
-        //}
 
         public void ShiftPriority(int newPriority) => Priority = newPriority;
         public void UpdateContent(string newContent) => Content = newContent;
@@ -73,13 +64,11 @@ namespace CyberNote.Models
             if (task == null) return;
             task.Owner = this;
             Tasks.Add(task);
-            //RefreshSchedule();
         }
         public void RemoveTask(TaskItem task)
         {
             if (task == null) return;
             Tasks.Remove(task);
-            //RefreshSchedule();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

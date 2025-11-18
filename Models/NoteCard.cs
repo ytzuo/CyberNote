@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CyberNote.Models
 {
-    interface NoteCard
+    public interface NoteCard
     {
         string Type { get; }
         string Title { get; set; }
