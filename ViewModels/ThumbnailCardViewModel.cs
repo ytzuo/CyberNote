@@ -130,9 +130,9 @@ namespace CyberNote.ViewModels
         }
 
         private void DumpTestData()
-        {
+        {   /*
             Debug.WriteLine("=== 测试：加载卡片数据 ===");
-            var notes = JsonReader.LoadAllCard("C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json");
+            var notes = JsonReader.LoadAllCard("C:\\Users\\Redmi\\source\\repos\\ytzuo\\CyberNote\\Data\\test_json.json");
             foreach (var n in notes)
             {
                 if (n is CommonNote cn)
@@ -150,6 +150,24 @@ namespace CyberNote.ViewModels
                 }
             }
             Debug.WriteLine("=== 结束 ===");
+            */
+            
+            Debug.WriteLine("=== 测试写入数据 ===");
+            var common = new CommonNote("开会", DateTime.Parse("2025-11-21T10:00:00"), 2, "和周会资料");
+            JsonWriter.AppendNote(@"C:\\Users\\Redmi\\source\\repos\\ytzuo\\CyberNote\\Data\\test_json.json", common);
+
+            // 2. 任务清单
+            var tasks = new List<TaskItem>
+            {
+                new TaskItem("牛奶 2 瓶"),
+                new TaskItem("全麦面包")
+            };
+            var list = new ListNote("购物清单", 1, "周末采购", tasks);
+            JsonWriter.AppendNote(@"C:\\Users\\Redmi\\source\\repos\\ytzuo\\CyberNote\\Data\\test_json.json", list);
+
+    
+            Debug.WriteLine("=== 结束 ===");
+            
         }
 
         private void WireTaskEvents()

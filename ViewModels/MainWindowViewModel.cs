@@ -112,6 +112,8 @@ namespace CyberNote.ViewModels
             ThumbnailCards.Add(l2);
             ThumbnailCards.Add(l3);
 
+
+
             var latest = ThumbnailCards.OrderByDescending(x => x.CreateDate).FirstOrDefault();
             if (latest?.Note != null)
             {

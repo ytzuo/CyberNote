@@ -19,9 +19,9 @@ namespace CyberNote.Models
         //无参构造函数
         public CommonNote(){ }
         //有参构造函数
-        public CommonNote(string T, DateTime schedule, int priority, string content)
+        public CommonNote(string title, DateTime schedule, int priority, string content)
         {
-            Title = T;
+            Title = title;
             Schedule = schedule;
             Priority = priority;
             Content = content;
