@@ -1,4 +1,7 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CyberNote.Models;
+using CyberNote.Services;
+using CyberNote.UI;
+using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,8 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using CyberNote.Models;
-using CyberNote.UI;
 
 namespace CyberNote.ViewModels
 {
@@ -92,7 +93,7 @@ namespace CyberNote.ViewModels
             var noteList2 = new ListNote("示例任务列表", 0, listContent2, tasksB) { createDate = DateTime.Now.AddDays(-2) };
             var l2 = new ThumbnailCardViewModel(noteList2) { Type = noteList2.Type, CreateDate = noteList2.createDate, Title = noteList2.Title };
             l2.BuildContentPreview();
-
+            
             // 第三个任务列表：大量任务（测试滚动与样式）
             var tasksC = new List<TaskItem>();
             for (int i = 1; i <= 15; i++)
@@ -112,12 +113,57 @@ namespace CyberNote.ViewModels
             ThumbnailCards.Add(l2);
             ThumbnailCards.Add(l3);
 
+
+
             var latest = ThumbnailCards.OrderByDescending(x => x.CreateDate).FirstOrDefault();
             if (latest?.Note != null)
             {
                 MainCardElement = MainCardFactory.Create(latest.Note);
                 SetActiveCard(latest);
             }
+
+            DumpTestData();
+        }
+
+        private void DumpTestData()
+        {   /*
+            Debug.WriteLine("=== 测试：加载卡片数据 ===");
+            var notes = JsonReader.LoadAllCard("C:\\Users\\Redmi\\source\\repos\\ytzuo\\CyberNote\\Data\\test_json.json");
+            foreach (var n in notes)
+            {
+                if (n is CommonNote cn)
+                {
+                    Debug.WriteLine($"[Common] Title={cn.Title} createDate={cn.createDate:yyyy-MM-dd HH:mm:ss} Priority={cn.Priority} Content={cn.Content}");
+                }
+                else if (n is ListNote ln)
+                {
+                    Debug.WriteLine($"[List] Title={ln.Title} createDate={ln.createDate:yyyy-MM-dd HH:mm:ss} Priority={ln.Priority} Tasks={ln.Tasks.Count} Content={ln.Content}");
+                    int idx = 1;
+                    foreach (var t in ln.Tasks)
+                    {
+                        Debug.WriteLine($"   - Task#{idx++}: Progress={(t.Progress ? "完成" : "未完成")}, Content={t.Content}");
+                    }
+                }
+            }
+            Debug.WriteLine("=== 结束 ===");
+            */
+
+            Debug.WriteLine("=== 测试写入数据 ===");
+            var common = new CommonNote("开会", DateTime.Parse("2025-11-21T10:00:00"), 2, "和周会资料");
+            JsonWriter.AppendNote(@"C:\Users\zz\Desktop\Code\C#\CyberNote\Data\test_json.json", common);
+
+            // 2. 任务清单
+            var tasks = new List<TaskItem>
+            {
+                new TaskItem("牛奶 2 瓶"),
+                new TaskItem("全麦面包")
+            };
+            var list = new ListNote("购物清单", 1, "周末采购", tasks);
+            JsonWriter.AppendNote(@"C:\Users\zz\Desktop\Code\C#\CyberNote\Data\test_json.json", list);
+
+
+            Debug.WriteLine("=== 结束 ===");
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace CyberNote.Models
@@ -11,5 +12,6 @@ namespace CyberNote.Models
         string Type { get; }
         string Title { get; set; }
         string Content { get; set; }
+        public JsonObject toJson();
     }
 }

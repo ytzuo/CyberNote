@@ -126,31 +126,9 @@ namespace CyberNote.ViewModels
             
             WireTaskEvents();
             BuildContentPreview();
-            DumpTestData();
+            //DumpTestData();
         }
-
-        private void DumpTestData()
-        {
-            Debug.WriteLine("=== 测试：加载卡片数据 ===");
-            var notes = JsonReader.LoadAllCard("C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json");
-            foreach (var n in notes)
-            {
-                if (n is CommonNote cn)
-                {
-                    Debug.WriteLine($"[Common] Title={cn.Title} createDate={cn.createDate:yyyy-MM-dd HH:mm:ss} Priority={cn.Priority} Content={cn.Content}");
-                }
-                else if (n is ListNote ln)
-                {
-                    Debug.WriteLine($"[List] Title={ln.Title} createDate={ln.createDate:yyyy-MM-dd HH:mm:ss} Priority={ln.Priority} Tasks={ln.Tasks.Count} Content={ln.Content}");
-                    int idx = 1;
-                    foreach (var t in ln.Tasks)
-                    {
-                        Debug.WriteLine($"   - Task#{idx++}: Progress={(t.Progress ? "完成" : "未完成")}, Content={t.Content}");
-                    }
-                }
-            }
-            Debug.WriteLine("=== 结束 ===");
-        }
+       
 
         private void WireTaskEvents()
         {
