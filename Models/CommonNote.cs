@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace CyberNote.Models
@@ -55,6 +56,21 @@ namespace CyberNote.Models
         public void update_schedule(DateTime new_schedule)
         {
             Schedule = new_schedule;
+        }
+
+        public JsonObject toJson()
+        {
+            var json = new JsonObject
+            {
+                ["Type"] = Type,
+                ["Title"] = Title,
+                ["Schedule"] = Schedule,
+                ["createDate"] = createDate,
+                ["Progress"] = Progress,
+                ["Priority"] = Priority,
+                ["Content"] = Content
+            };
+            return json;
         }
 
     }

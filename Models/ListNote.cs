@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
 
 namespace CyberNote.Models
 {
@@ -73,5 +74,19 @@ namespace CyberNote.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public JsonObject toJson()
+        {
+            var obj = new JsonObject
+            {
+                ["Type"] = Type,
+                ["Title"] = Title,
+                ["Content"] = Content,
+                ["createDate"] = createDate,
+                ["Priority"] = Priority,
+                ["Tasks"] = new JsonArray(Tasks.Select(t => t.toJson()).ToArray())
+            };
+            return obj;
+        }
     }
 }
