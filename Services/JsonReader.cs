@@ -1,8 +1,10 @@
 ﻿using CyberNote.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
+using System.Text.Json.Nodes;
+using System.Linq;
 
 namespace CyberNote.Services
 {
@@ -14,86 +16,41 @@ namespace CyberNote.Services
         public static List<NoteCard> LoadAllCard(string filePath)
         {
             if (!File.Exists(filePath)) return new List<NoteCard>();
-
-            var list = new List<NoteCard>();
             using var doc = JsonDocument.Parse(File.ReadAllText(filePath));
-
+            var list = new List<NoteCard>();
             foreach (var el in doc.RootElement.EnumerateArray())
             {
                 if (el.ValueKind != JsonValueKind.Object) continue;
                 if (!el.TryGetProperty("Type", out var typeProp)) continue;
-
                 var type = typeProp.GetString();
+
+                // 读取 id （允许旧数据无 id）
+                string id = el.TryGetProperty("id", out var idProp) ? (idProp.GetString() ?? Guid.NewGuid().ToString()) : Guid.NewGuid().ToString();
+
                 switch (type)
                 {
                     case "Common":
-                        list.Add(ReadCommonNote(el));
+                        var common = JsonSerializer.Deserialize<CommonNote>(el.GetRawText());
+                        if (common != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(common.Id)) common.Id = id;
+                            list.Add(common);
+                        }
                         break;
                     case "List":
-                        list.Add(ReadListNote(el));
+                        var listNote = JsonSerializer.Deserialize<ListNote>(el.GetRawText());
+                        if (listNote != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(listNote.Id)) listNote.Id = id;
+                            foreach (var t in listNote.Tasks)
+                                t.Owner = listNote;
+                            list.Add(listNote);
+                        }
                         break;
-                        // 后续扩展新类型在这里加 case
                 }
             }
             return list;
         }
-
-        private static CommonNote ReadCommonNote(JsonElement el)
-        {
-            var note = new CommonNote();
-            note.Title = el.GetPropertyString("Title") ?? "无标题";
-            note.Content = el.GetPropertyString("Content") ?? string.Empty;
-            note.Schedule = el.GetPropertyDateTime("Schedule");
-            note.createDate = el.GetPropertyDateTime("createDate");
-            note.Progress = el.GetPropertyBool("Progress");
-            note.Priority = el.GetPropertyInt("Priority");
-            return note;
-        }
-
-        private static ListNote ReadListNote(JsonElement el)
-        {
-            var note = new ListNote();
-            note.Title = el.GetPropertyString("Title") ?? "无标题";
-            note.Content = el.GetPropertyString("Content") ?? string.Empty;
-            note.createDate = el.GetPropertyDateTime("createDate");
-            note.Priority = el.GetPropertyInt("Priority");
-
-            if (el.TryGetProperty("Tasks", out var tasksEl) && tasksEl.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var t in tasksEl.EnumerateArray())
-                {
-                    var task = new TaskItem
-                    {
-                        Content = t.GetPropertyString("Content") ?? string.Empty,
-                        Progress = t.GetPropertyBool("Progress")
-                    };
-                    task.Owner = note;   // 关键：补引用
-                    note.Tasks.Add(task);
-                }
-            }
-            return note;
-        }
-
-        #region 小工具：安全读取各类值
-        private static string? GetPropertyString(this JsonElement el, string name)
-            => el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String
-               ? v.GetString()
-               : null;
-
-        private static bool GetPropertyBool(this JsonElement el, string name, bool def = false)
-            => el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.True;
-
-        private static int GetPropertyInt(this JsonElement el, string name, int def = 0)
-            => el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.Number
-               ? v.GetInt32()
-               : def;
-
-        private static DateTime GetPropertyDateTime(this JsonElement el, string name)
-            => el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String
-               && DateTime.TryParse(v.GetString(), out var dt)
-               ? dt
-               : default;
-        #endregion
     }
 }
 

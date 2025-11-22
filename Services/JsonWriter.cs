@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CyberNote.Models;
+using System.Linq;
 
 namespace CyberNote.Services
 {
@@ -13,43 +14,39 @@ namespace CyberNote.Services
         {
             if (note == null) throw new ArgumentNullException(nameof(note));
 
-            // 读取现有 JSON 数组；不存在则新建
-            JsonArray rootArray;
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    var text = File.ReadAllText(filePath).Trim();
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        var parsed = JsonNode.Parse(text);
-                        rootArray = parsed as JsonArray ?? new JsonArray();
-                    }
-                    else rootArray = new JsonArray();
-                }
-                catch
-                {
-                    // 文件损坏时，重建数组
-                    rootArray = new JsonArray();
-                }
-            }
-            else
-            {
-                rootArray = new JsonArray();
-            }
+            JsonArray rootArray = LoadExistingArray(filePath);
 
-            // 通过多态接口生成 JsonObject 并追加
-            var obj = note.toJson();
-            rootArray.Add(obj);
+            string newId = note.Id;
+            bool exists = rootArray.Any(n => n is JsonObject o &&
+                                             ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == newId) ||
+                                              (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == newId)));
+            if (exists) return; // 已存在同 ID
 
+            rootArray.Add(note.toJson());
+            WriteArray(filePath, rootArray);
+        }
+
+        private static JsonArray LoadExistingArray(string filePath)
+        {
+            if (!File.Exists(filePath)) return new JsonArray();
+            try
+            {
+                var text = File.ReadAllText(filePath).Trim();
+                if (string.IsNullOrEmpty(text)) return new JsonArray();
+                var parsed = JsonNode.Parse(text);
+                return parsed as JsonArray ?? new JsonArray();
+            }
+            catch { return new JsonArray(); }
+        }
+
+        private static void WriteArray(string filePath, JsonArray arr)
+        {
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
-
-            File.WriteAllText(filePath, rootArray.ToJsonString(options));
+            File.WriteAllText(filePath, arr.ToJsonString(options));
         }
     }
 }
