@@ -47,7 +47,7 @@ namespace CyberNote.ViewModels
         }
         private void ReplaceMainCardExecute(ThumbnailCardViewModel vm)
         {
-            Debug.WriteLine($"ReplaceMainCard executed: Title={vm?.Title}, Type={vm?.Type}");
+            //Debug.WriteLine($"ReplaceMainCard executed: Title={vm?.Title}, Type={vm?.Type}");
             if (vm?.Note == null) return;
             MainCardElement = MainCardFactory.Create(vm.Note);
             SetActiveCard(vm);
@@ -87,7 +87,7 @@ namespace CyberNote.ViewModels
                 };
                 ThumbnailCards.Add(vm);
             }
-            //SetActiveCard(ThumbnailCards.First());
+
             ReplaceMainCardExecute(ThumbnailCards.First());
             //DumpJsonDebug(cards);
         }
