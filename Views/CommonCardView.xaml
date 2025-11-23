@@ -4,7 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="240" d:DesignWidth="320">
+             d:DesignHeight="240" d:DesignWidth="320"
+             x:Name="Root">
+    <UserControl.Resources>
+        <!-- 布尔值转可见性转换器 -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+    
     <Border Background="White" Padding="12" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
@@ -14,34 +20,82 @@
             </Grid.RowDefinitions>
 
             <!-- 顶部：标题 -->
+            <!-- 查看模式 -->
             <TextBlock Grid.Row="0"
                        Text="{Binding Title}"
                        FontSize="18"
                        FontWeight="SemiBold"
                        Foreground="#2C3E50"
-                       TextTrimming="CharacterEllipsis"/>
+                       TextTrimming="CharacterEllipsis"
+                       MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
+                       Cursor="Hand"
+                       Visibility="{Binding IsViewMode, ElementName=Root, Converter={StaticResource BoolToVis}}"/>
+            
+            <!-- 编辑模式 -->
+            <TextBox Grid.Row="0"
+                     Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                     FontSize="18"
+                     FontWeight="SemiBold"
+                     Foreground="#2C3E50"
+                     BorderBrush="#4CAF50"
+                     BorderThickness="0,0,0,2"
+                     Background="Transparent"
+                     LostFocus="EditElement_LostFocus"
+                     KeyDown="EditElement_KeyDown"
+                     Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"
+                     x:Name="TitleTextBox"/>
 
             <!-- 中间：正文，支持上下滚动 -->
+            <!-- 查看模式 -->
             <ScrollViewer Grid.Row="1"
                           Margin="0,8,0,8"
                           VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled">
+                          HorizontalScrollBarVisibility="Disabled"
+                          Visibility="{Binding IsViewMode, ElementName=Root, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="{Binding Content}"
                            TextWrapping="Wrap"
                            Foreground="#333333"
-                           FontSize="14"/>
+                           FontSize="14"
+                           MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
+                           Cursor="Hand"/>
             </ScrollViewer>
+            
+            <!-- 编辑模式 -->
+            <TextBox Grid.Row="1"
+                     Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,8,0,8"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     Foreground="#333333"
+                     FontSize="14"
+                     BorderBrush="#4CAF50"
+                     BorderThickness="1"
+                     Padding="4"
+                     LostFocus="EditElement_LostFocus"
+                     KeyDown="EditElement_KeyDown"
+                     Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"
+                     x:Name="ContentTextBox"/>
 
             <!-- 底部仅显示创建日期，移除完成状态 -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
                            Text="{Binding createDate, StringFormat='{}{0:yyyy-MM-dd}'}"
                            Foreground="#666666"
                            FontSize="12"/>
+                
+                <!-- 编辑模式提示 -->
+                <TextBlock Grid.Column="1"
+                           Text="Esc退出"
+                           Foreground="#4CAF50"
+                           FontSize="10"
+                           FontStyle="Italic"
+                           Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"/>
             </Grid>
         </Grid>
     </Border>

@@ -124,9 +124,41 @@ namespace CyberNote.ViewModels
             Type = note.Type;
             CreateDate = (note as CommonNote)?.createDate != default ? (note as CommonNote)!.createDate : DateTime.Now;
             
+            WireNoteEvents();
             WireTaskEvents();
             BuildContentPreview();
             //DumpTestData();
+        }
+
+        /// <summary>
+        /// 监听 Note 对象的属性变化，自动同步到 ViewModel
+        /// </summary>
+        private void WireNoteEvents()
+        {
+            if (Note is INotifyPropertyChanged notifyNote)
+            {
+                notifyNote.PropertyChanged += Note_PropertyChanged;
+            }
+        }
+
+        /// <summary>
+        /// 当 Note 的属性变化时，同步更新 ViewModel 的对应属性
+        /// </summary>
+        private void Note_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(NoteCard.Title):
+                    Title = Note?.Title ?? string.Empty;
+                    break;
+                case nameof(NoteCard.Content):
+                    BuildContentPreview();
+                    break;
+                case nameof(CommonNote.createDate):
+                    if (Note is CommonNote cn)
+                        CreateDate = cn.createDate;
+                    break;
+            }
         }
        
 

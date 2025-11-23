@@ -1,35 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace CyberNote.Models
 {
-    public class CommonNote : NoteCard
+    public class CommonNote : NoteCard, INotifyPropertyChanged
     {
-        public string Id { get; set; } = string.Empty;
+        private string _id = string.Empty;
+        private string _title = "无标题";
+        private DateTime _schedule;
+        private DateTime _createDate;
+        private bool _progress = false;
+        private int _priority;
+        private string _content = string.Empty;
+
+        public string Id
+        {
+            get => _id;
+            set { if (_id != value) { _id = value; OnPropertyChanged(); } }
+        }
+
         public string Type { get; } = "Common";
-        public string Title { get; set; } = "无标题";
-        public DateTime Schedule { get; set; }
-        public DateTime createDate { get; set; }
-        public bool Progress { get; set; } = false;
-        public int Priority { get; set; }
-        public string Content { get; set; } = string.Empty;
+
+        public string Title
+        {
+            get => _title;
+            set { if (_title != value) { _title = value; OnPropertyChanged(); } }
+        }
+
+        public DateTime Schedule
+        {
+            get => _schedule;
+            set { if (_schedule != value) { _schedule = value; OnPropertyChanged(); } }
+        }
+
+        public DateTime createDate
+        {
+            get => _createDate;
+            set { if (_createDate != value) { _createDate = value; OnPropertyChanged(); } }
+        }
+
+        public bool Progress
+        {
+            get => _progress;
+            set { if (_progress != value) { _progress = value; OnPropertyChanged(); } }
+        }
+
+        public int Priority
+        {
+            get => _priority;
+            set { if (_priority != value) { _priority = value; OnPropertyChanged(); } }
+        }
+
+        public string Content
+        {
+            get => _content;
+            set { if (_content != value) { _content = value; OnPropertyChanged(); } }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         //无参构造函数
-        public CommonNote(){ }
+        public CommonNote() { }
+
         //有参构造函数
         public CommonNote(string id, string title, DateTime schedule, int priority, string content)
         {
-            Id = id;
-            Title = title;
-            Schedule = schedule;
-            Priority = priority;
-            Content = content;
-            Progress = false; // 默认状态
+            _id = id;
+            _title = title;
+            _schedule = schedule;
+            _priority = priority;
+            _content = content;
+            _progress = false; // 默认状态
         }
+
         // Backward-compatible overload auto-generating id
         public CommonNote(string title, DateTime schedule, int priority, string content)
             : this(Guid.NewGuid().ToString(), title, schedule, priority, content) { }
