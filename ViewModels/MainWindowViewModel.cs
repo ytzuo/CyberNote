@@ -27,7 +27,8 @@ namespace CyberNote.ViewModels
         private void ExecuteAddNewCard()
         {
             var content = "点击编辑内容...\n第二行示例";
-            var note = new CommonNote("新笔记标题", DateTime.Now, 0, content) { createDate = DateTime.Now };
+            var note = new CommonNote("新笔记标题", DateTime.Now, 0, content) 
+                        { createDate = DateTime.Now };
             var newCard = new ThumbnailCardViewModel(note)
             {
                 Type = note.Type,
@@ -38,6 +39,8 @@ namespace CyberNote.ViewModels
             ThumbnailCards.Add(newCard);
             Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
         }
+
+
 
         private FrameworkElement? _mainCardElement;
         public FrameworkElement? MainCardElement

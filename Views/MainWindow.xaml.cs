@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using CyberNote.Services;
 
 namespace CyberNote
 {
@@ -92,7 +93,8 @@ namespace CyberNote
         private void CreateCommonNote(MainWindowViewModel vm)
         {
             var content = "点击编辑内容...\n第二行示例";
-            var note = new Models.CommonNote("新随手记", DateTime.Now, 0, content) { createDate = DateTime.Now };
+            var note = new Models.CommonNote("新随手记", DateTime.Now, 0, content) 
+                    { createDate = DateTime.Now };
             var newCard = new ThumbnailCardViewModel(note)
             {
                 Type = note.Type,
@@ -105,6 +107,7 @@ namespace CyberNote
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
                 vm.ReplaceMainCard.Execute(newCard);
+
         }
 
         private void CreateListNote(MainWindowViewModel vm)
