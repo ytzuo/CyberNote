@@ -66,6 +66,12 @@ namespace CyberNote.Views
             }
         }
 
+        // 勾选变化时保存，确保进度状态持久化
+        private void TaskProgress_Changed(object sender, RoutedEventArgs e)
+        {
+            SaveCurrentListNote();
+        }
+
         private void SaveCurrentListNote()
         {
             // DataContext 是 ListNote（在 ListCardView 的构造函数中设置）
