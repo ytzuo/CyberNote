@@ -10,6 +10,7 @@ namespace CyberNote.Models
         //private DateTime _schedule;
         private bool _progress;
         private string _content = string.Empty;
+        private bool _isEditing; // 新增：是否处于编辑模式
 
         //public DateTime Schedule
         //{
@@ -35,6 +36,12 @@ namespace CyberNote.Models
         {
             get => _content;
             set { _content = value; OnPropertyChanged(); }
+        }
+
+        public bool IsEditing
+        {
+            get => _isEditing;
+            set { if (_isEditing != value) { _isEditing = value; OnPropertyChanged(); } }
         }
 
         internal ListNote? Owner { get; set; }

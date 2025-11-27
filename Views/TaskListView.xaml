@@ -7,9 +7,12 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="400">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
-        <!-- 修改 ItemsSource 绑定到控件自身的 Tasks 依赖属性 -->
         <ItemsControl ItemsSource="{Binding Tasks, RelativeSource={RelativeSource AncestorType=UserControl}}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -19,26 +22,53 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- 任务内容文字，根据完成状态改变样式 -->
+                        <!-- 查看模式文本 -->
                         <TextBlock Grid.Column="0"
                                    Text="{Binding Content}"
                                    FontSize="14"
                                    VerticalAlignment="Center"
                                    TextWrapping="Wrap"
-                                   TextTrimming="CharacterEllipsis">
+                                   TextTrimming="CharacterEllipsis"
+                                   Cursor="Hand">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="#333333"/>
                                     <Setter Property="TextDecorations" Value="{x:Null}"/>
+                                    <Setter Property="Visibility" Value="Visible"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Progress}" Value="True">
                                             <Setter Property="Foreground" Value="#888888"/>
                                             <Setter Property="TextDecorations" Value="Strikethrough"/>
                                         </DataTrigger>
+                                        <!-- 编辑中隐藏查看模式文本 -->
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
+                            <TextBlock.InputBindings>
+                                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=Tag}" CommandParameter="{Binding}"/>
+                            </TextBlock.InputBindings>
                         </TextBlock>
+
+                        <!-- 编辑模式输入框 -->
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="14"
+                                 VerticalAlignment="Center"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"
+                                 BorderBrush="#4CAF50"
+                                 BorderThickness="0,0,0,2"
+                                 Background="Transparent"
+                                 LostFocus="TaskEdit_LostFocus">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Modifiers="Ctrl" Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=Tag}" CommandParameter="{Binding}"/>
+                                <KeyBinding Key="Escape" Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=Tag}" CommandParameter="{Binding}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
 
                         <!-- 完成状态勾选框 -->
                         <CheckBox Grid.Column="1"

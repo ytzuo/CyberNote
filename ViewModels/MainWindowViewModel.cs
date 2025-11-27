@@ -50,7 +50,17 @@ namespace CyberNote.ViewModels
         }
         private void ReplaceMainCardExecute(ThumbnailCardViewModel vm)
         {
-            //Debug.WriteLine($"ReplaceMainCard executed: Title={vm?.Title}, Type={vm?.Type}");
+            // 只关闭当前激活卡片中的任务编辑模式
+            var previousActive = ThumbnailCards.FirstOrDefault(c => c.IsActive);
+            if (previousActive?.Note is ListNote oldList)
+            {
+                foreach (var task in oldList.Tasks)
+                {
+                    if (task.IsEditing)
+                        task.IsEditing = false;
+                }
+            }
+
             if (vm?.Note == null) return;
             MainCardElement = MainCardFactory.Create(vm.Note);
             SetActiveCard(vm);
