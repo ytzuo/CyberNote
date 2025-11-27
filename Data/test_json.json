@@ -1,27 +1,5 @@
 [
   {
-    "Id": "c89ef854-a149-4309-94d2-ea8f4b2a5afb",
-    "Type": "List",
-    "Title": "今日待办",
-    "Priority": 3,
-    "Content": "把今天必须做完的事情清掉",
-    "createDate": "2025-11-18T08:00:00",
-    "Tasks": [
-      {
-        "Content": "写完 CyberNote 单元测试",
-        "Progress": true
-      },
-      {
-        "Content": "给 ListNote 加 JSON 导入导出",
-        "Progress": false
-      },
-      {
-        "Content": "跑一遍冒烟测试",
-        "Progress": false
-      }
-    ]
-  },
-  {
     "Id": "664a7b22-d54b-4a74-9e2e-7029356bf9ce",
     "Type": "List",
     "Title": "购物清单",
@@ -104,5 +82,27 @@
     "Progress": true,
     "Priority": 2,
     "Content": "测试3用"
+  },
+  {
+    "id": "c89ef854-a149-4309-94d2-ea8f4b2a5afb",
+    "Type": "List",
+    "Title": "今日待办",
+    "Content": "把今天必须做完的事情清掉",
+    "createDate": "2025-11-18T08:00:00",
+    "Priority": 3,
+    "Tasks": [
+      {
+        "Content": "写完 CyberNote 单元测试",
+        "Progress": true
+      },
+      {
+        "Content": "给 ListNote 加 JSON 导入导出",
+        "Progress": true
+      },
+      {
+        "Content": "测试一下编辑保存功能",
+        "Progress": true
+      }
+    ]
   }
 ]

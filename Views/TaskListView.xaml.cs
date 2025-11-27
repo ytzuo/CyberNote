@@ -1,4 +1,5 @@
 using CyberNote.Models;
+using CyberNote.Services;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,26 +48,35 @@ namespace CyberNote.Views
             public void Execute(object? parameter)
             {
                 if (parameter is not TaskItem task) return;
-
-                // 如果当前处于编辑模式：按 Esc 或 Ctrl+Enter 退出编辑
-                if (task.IsEditing)
+                task.IsEditing = !task.IsEditing;
+                if (!task.IsEditing)
                 {
-                    task.IsEditing = false; // 已是双向绑定，内容自动更新
-                }
-                else
-                {
-                    // 进入编辑模式
-                    task.IsEditing = true;
+                    _owner.SaveCurrentListNote();
                 }
             }
         }
 
-        // 失去焦点时退出编辑模式
+        // 失去焦点时退出编辑模式并保存
         private void TaskEdit_LostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox tb && tb.DataContext is TaskItem task)
             {
-                task.IsEditing = false; // 双向绑定自动保存内容
+                task.IsEditing = false;
+                SaveCurrentListNote();
+            }
+        }
+
+        private void SaveCurrentListNote()
+        {
+            // DataContext 是 ListNote（在 ListCardView 的构造函数中设置）
+            if (DataContext is ListNote list)
+            {
+                // 从窗口的 DataContext 取保存路径
+                if (Window.GetWindow(this)?.DataContext is CyberNote.ViewModels.MainWindowViewModel vm)
+                {
+                    var path = vm.DataFilePath;
+                    JsonWriter.SaveNote(path, list);
+                }
             }
         }
     }

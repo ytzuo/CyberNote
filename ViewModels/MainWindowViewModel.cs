@@ -24,6 +24,9 @@ namespace CyberNote.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public ICommand ReplaceMainCard { get; }
 
+        // 暴露数据文件路径，供保存使用
+        public string DataFilePath { get; } = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+
         private void ExecuteAddNewCard()
         {
             var content = "点击编辑内容...\n第二行示例";
@@ -82,7 +85,7 @@ namespace CyberNote.ViewModels
 
         private void LoadCard()
         {
-            var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+            var path = DataFilePath;
             if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
            
             var cards = JsonReader.LoadAllCard(path);
