@@ -24,10 +24,14 @@ namespace CyberNote.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public ICommand ReplaceMainCard { get; }
 
+        // 暴露数据文件路径，供保存使用
+        public string DataFilePath { get; } = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+
         private void ExecuteAddNewCard()
         {
             var content = "点击编辑内容...\n第二行示例";
-            var note = new CommonNote("新笔记标题", DateTime.Now, 0, content) { createDate = DateTime.Now };
+            var note = new CommonNote("新笔记标题", DateTime.Now, 0, content) 
+                        { createDate = DateTime.Now };
             var newCard = new ThumbnailCardViewModel(note)
             {
                 Type = note.Type,
@@ -39,6 +43,8 @@ namespace CyberNote.ViewModels
             Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
         }
 
+
+
         private FrameworkElement? _mainCardElement;
         public FrameworkElement? MainCardElement
         {
@@ -47,7 +53,17 @@ namespace CyberNote.ViewModels
         }
         private void ReplaceMainCardExecute(ThumbnailCardViewModel vm)
         {
-            //Debug.WriteLine($"ReplaceMainCard executed: Title={vm?.Title}, Type={vm?.Type}");
+            // 只关闭当前激活卡片中的任务编辑模式
+            var previousActive = ThumbnailCards.FirstOrDefault(c => c.IsActive);
+            if (previousActive?.Note is ListNote oldList)
+            {
+                foreach (var task in oldList.Tasks)
+                {
+                    if (task.IsEditing)
+                        task.IsEditing = false;
+                }
+            }
+
             if (vm?.Note == null) return;
             MainCardElement = MainCardFactory.Create(vm.Note);
             SetActiveCard(vm);
@@ -69,7 +85,7 @@ namespace CyberNote.ViewModels
 
         private void LoadCard()
         {
-            var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+            var path = DataFilePath;
             if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
            
             var cards = JsonReader.LoadAllCard(path);

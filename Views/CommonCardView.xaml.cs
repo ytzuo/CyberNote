@@ -1,8 +1,12 @@
-﻿using System;
+﻿using CyberNote.Models;
+using CyberNote.Services;
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection.Metadata;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CyberNote.Models;
 
 namespace CyberNote.Views
 {
@@ -65,25 +69,68 @@ namespace CyberNote.Views
         private void EditElement_LostFocus(object sender, System.Windows.RoutedEventArgs e)
         {
             IsEditMode = false;
+            // 保存到 JSON：DataContext 绑定到 CommonNote，Content 已被更新
+                if (DataContext is CommonNote note)
+            {
+                try
+                {
+                    //var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "test_json.json");
+                    var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+                    var dir = Path.GetDirectoryName(path);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+
+                    if (string.IsNullOrWhiteSpace(note.Id))
+                        note.Id = Guid.NewGuid().ToString();
+
+                    // 使用 SaveNote，它会清除旧条目并复用 AppendNote 追加新条目
+                    JsonWriter.SaveNote(path, note);
+
+                    Debug.WriteLine($"Note saved: Id={note.Id} Title={note.Title}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"保存笔记失败: {ex.Message}");
+                }
+            }
         }
 
         /// <summary>
-        /// 按 Enter 保存并退出编辑模式
+        /// 按 Esc 保存并退出编辑模式（使用已有 AppendNote 实现）
         /// </summary>
         private void EditElement_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+           if (e.Key == Key.Escape)
             {
-                // Ctrl+Enter 保存并退出
+                // 退出编辑模式
                 IsEditMode = false;
                 e.Handled = true;
-            }
-            else if (e.Key == Key.Escape)
-            {
-                // Esc 取消编辑（不保存，因为是双向绑定已经自动保存了）
-                IsEditMode = false;
-                e.Handled = true;
-            }
+
+                // 保存到 JSON：DataContext 绑定到 CommonNote，Content 已被更新
+                if (DataContext is CommonNote note)
+                {
+                    try
+                    {
+                        //var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "test_json.json");
+                        var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+                        var dir = Path.GetDirectoryName(path);
+                        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                            Directory.CreateDirectory(dir);
+
+                        if (string.IsNullOrWhiteSpace(note.Id))
+                            note.Id = Guid.NewGuid().ToString();
+
+                        // 使用 SaveNote，它会清除旧条目并复用 AppendNote 追加新条目
+                        JsonWriter.SaveNote(path, note);
+
+                        Debug.WriteLine($"Note saved: Id={note.Id} Title={note.Title}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"保存笔记失败: {ex.Message}");
+                    }
+                }
+           }
         }
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace CyberNote.Views
 {
@@ -21,6 +22,7 @@ namespace CyberNote.Views
     /// </summary>
     public partial class ListCardView : UserControl
     {
+
         public ListCardView()
         {
             InitializeComponent();
@@ -30,6 +32,43 @@ namespace CyberNote.Views
         {
             InitializeComponent();
             DataContext = note ?? throw new ArgumentNullException(nameof(note));
+        }
+
+        private void AddTaskBtn_Clicked(object sender, RoutedEventArgs e)
+        {
+            // 新增任务项到末尾
+            if (DataContext is ListNote list)
+            {
+                var task = new TaskItem("新任务");
+                list.AddTask(task);
+                task.IsEditing = true; // 默认进入编辑模式，方便立即输入
+
+                // 等待UI更新后滚动到底部
+                Dispatcher.BeginInvoke(() =>
+                {
+                    var taskListView = FindChild<TaskListView>(this);
+                    if (taskListView != null)
+                    {
+                        var scrollViewer = FindChild<ScrollViewer>(taskListView);
+                        scrollViewer?.ScrollToEnd();
+                    }
+                }, DispatcherPriority.Background);
+            }
+        }
+
+        // 递归查找指定类型的子元素
+        private static T? FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null) return null;
+            int count = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < count; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typed) return typed;
+                var result = FindChild<T>(child);
+                if (result != null) return result;
+            }
+            return null;
         }
     }
 }

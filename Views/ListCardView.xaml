@@ -6,11 +6,34 @@
              xmlns:views="clr-namespace:CyberNote.Views"
              mc:Ignorable="d" 
              d:DesignHeight="240" d:DesignWidth="320">
+    <UserControl.Resources>
+        <Style x:Key="FlatButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                             BorderBrush="{TemplateBinding BorderBrush}" 
+                             BorderThickness="0" 
+                             CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     <Border Background="White" Padding="12" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -26,9 +49,18 @@
             <views:TaskListView Grid.Row="1"
                                  Margin="0,8,0,8"
                                  Tasks="{Binding Tasks}"/>
+            
+            <Button 
+                Grid.Row="2"
+                Content="新增任务" 
+                Height="20" 
+                Style="{StaticResource FlatButton}" 
+                Click="AddTaskBtn_Clicked" 
+                x:Name="AddTaskBtn"/>
+
 
             <!-- 底部：创建日期与完成状态（Progress 字段若无可替换为其他信息） -->
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>

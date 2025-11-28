@@ -44,12 +44,6 @@
     </UserControl.Resources>
 
     <Border Style="{StaticResource ThumbnailBorderStyle}" CornerRadius="8" Padding="12">
-        <!-- 绑定点击方法 -->
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseLeftButtonUp">
-                <i:InvokeCommandAction Command="{Binding OnClickCommand}" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -72,14 +66,14 @@
                                HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- 标题 -->
-                <TextBlock Text="{Binding Title}"
+                <!-- 标题（使用截断转换器，编辑时也会实时生效） -->
+                <TextBlock Text="{Binding Title, Converter={StaticResource TruncateConverter}}"
                            Style="{StaticResource ThumbnailTextStyle}"
                            FontWeight="SemiBold"
                            TextTrimming="CharacterEllipsis"/>
 
                 <!-- 内容预览：限制显示高度约两行，超出使用裁剪并添加省略号（通过绑定预处理） -->
-                <TextBlock Text="{Binding ContentPreview}"
+                <TextBlock Text="{Binding ContentPreview, Converter={StaticResource TruncateConverter}}"
                            Style="{StaticResource ThumbnailTextStyle}"
                            TextWrapping="Wrap"
                            TextTrimming="CharacterEllipsis"/>
