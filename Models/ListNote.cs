@@ -45,6 +45,7 @@ namespace CyberNote.Models
 
         public ListNote() { }
 
+        // 新增兼容性构造：保留带 priority 的构造，同时增加不带 priority 的重载以向后兼容
         public ListNote(string id, string title, int priority, string content, IEnumerable<TaskItem> tasks)
         {
             Id = id;
@@ -58,9 +59,17 @@ namespace CyberNote.Models
                 Tasks.Add(t);
             }
         }
+
         // Backward-compatible overload auto-generating id
         public ListNote(string title, int priority, string content, IEnumerable<TaskItem> tasks)
             : this(Guid.NewGuid().ToString(), title, priority, content, tasks) { }
+
+        // 兼容旧代码：不传 priority 时默认 priority = 0
+        public ListNote(string id, string title, string content, IEnumerable<TaskItem> tasks)
+            : this(id, title, 0, content, tasks) { }
+
+        public ListNote(string title, string content, IEnumerable<TaskItem> tasks)
+            : this(Guid.NewGuid().ToString(), title, 0, content, tasks) { }
 
         public void ShiftPriority(int newPriority) => Priority = newPriority;
         public void UpdateContent(string newContent) => Content = newContent;

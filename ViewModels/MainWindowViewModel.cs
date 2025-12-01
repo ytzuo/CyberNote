@@ -24,6 +24,9 @@ namespace CyberNote.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public ICommand ReplaceMainCard { get; }
 
+        // 暴露数据文件路径，供保存使用
+        public string DataFilePath { get; } = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+
         private void ExecuteAddNewCard()
         {
             var content = "点击编辑内容...\n第二行示例";
@@ -71,9 +74,11 @@ namespace CyberNote.ViewModels
         {
             var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
             if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
-           
+            
+            //加载所有卡片存储的list
             var cards = JsonReader.LoadAllCard(path);
-           
+            cards = SortNoteCards(cards);
+
             var idSet = new HashSet<string>();
             foreach (var card in cards)
             {
@@ -91,6 +96,35 @@ namespace CyberNote.ViewModels
             ReplaceMainCardExecute(ThumbnailCards.First());
             //DumpJsonDebug(cards);
         }
+
+        // 排序选项（可扩展）
+        public enum SortOption
+        {
+            ByDateDesc,
+            ByDateAsc,
+            //ByPriorityDesc,
+            //ByPriorityAsc
+        }
+
+        // 当前排序策略（默认按时间降序）
+        public SortOption CurrentSort { get; set; } = SortOption.ByDateDesc;
+
+        /// <summary>
+        /// 对 NoteCard 列表按当前排序规则排序（用于读取后决定初始顺序）
+        /// </summary>
+        private List<NoteCard> SortNoteCards(List<NoteCard> cards)
+        {
+            return CurrentSort switch
+            {
+                SortOption.ByDateAsc => cards.OrderBy(c => c.createDate).ToList(),
+                SortOption.ByDateDesc => cards.OrderByDescending(c => c.createDate).ToList(),
+                //SortOption.ByPriorityAsc => cards.OrderBy(c => c.Priority).ToList(),
+                //SortOption.ByPriorityDesc => cards.OrderByDescending(c => c.Priority).ToList(),
+                _ => cards
+            };
+        }
+
+
 
         private void DumpJsonDebug(List<NoteCard> cards)
         {
