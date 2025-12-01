@@ -24,6 +24,8 @@ namespace CyberNote.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public ICommand ReplaceMainCard { get; }
 
+        public ICommand DeleteCard { get; }
+
         // 暴露数据文件路径，供保存使用
         public string DataFilePath { get; } = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
 
@@ -51,7 +53,7 @@ namespace CyberNote.ViewModels
             get => _mainCardElement;
             set { _mainCardElement = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MainCardElement))); }
         }
-        private void ReplaceMainCardExecute(ThumbnailCardViewModel vm)
+        private void ExecuteReplaceMainCard(ThumbnailCardViewModel vm)
         {
             // 只关闭当前激活卡片中的任务编辑模式
             var previousActive = ThumbnailCards.FirstOrDefault(c => c.IsActive);
@@ -69,6 +71,26 @@ namespace CyberNote.ViewModels
             SetActiveCard(vm);
         }
 
+        private void ExecuteDeleteCard(ThumbnailCardViewModel vm)
+        {
+            if (vm == null) return;
+            NoteCard note = vm.Note!;
+            if (note == null) return;
+            String noteId = note.Id;
+            bool wasActive = vm.IsActive;
+            ThumbnailCards.Remove(vm);
+            JsonWriter.DeleteNote(DataFilePath, noteId);
+            // 如果删除的是当前激活的卡片，尝试激活列表中的第一张卡片
+            if (wasActive && ThumbnailCards.Count > 0)
+            {
+                ExecuteReplaceMainCard(ThumbnailCards.First());
+            }
+            else if (ThumbnailCards.Count == 0)
+            {
+                MainCardElement = null; // 没有卡片时清空主卡片显示
+            }
+        }
+
         private void SetActiveCard(ThumbnailCardViewModel active)
         {
             foreach (var card in ThumbnailCards)
@@ -78,7 +100,8 @@ namespace CyberNote.ViewModels
         public MainWindowViewModel()
         {
             AddNewCardCommand = new RelayCommand(ExecuteAddNewCard);
-            ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ReplaceMainCardExecute);
+            ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ExecuteReplaceMainCard);
+            DeleteCard = new RelayCommand<ThumbnailCardViewModel>(ExecuteDeleteCard);
 
             LoadCard();
         }
@@ -87,9 +110,11 @@ namespace CyberNote.ViewModels
         {
             var path = DataFilePath;
             if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
-           
+            
+            //加载所有卡片存储的list
             var cards = JsonReader.LoadAllCard(path);
-           
+            cards = SortNoteCards(cards);
+
             var idSet = new HashSet<string>();
             foreach (var card in cards)
             {
@@ -104,9 +129,38 @@ namespace CyberNote.ViewModels
                 ThumbnailCards.Add(vm);
             }
 
-            ReplaceMainCardExecute(ThumbnailCards.First());
+            ExecuteReplaceMainCard(ThumbnailCards.First());
             //DumpJsonDebug(cards);
         }
+
+        // 排序选项（可扩展）
+        public enum SortOption
+        {
+            ByDateDesc,
+            ByDateAsc,
+            //ByPriorityDesc,
+            //ByPriorityAsc
+        }
+
+        // 当前排序策略（默认按时间降序）
+        public SortOption CurrentSort { get; set; } = SortOption.ByDateDesc;
+
+        /// <summary>
+        /// 对 NoteCard 列表按当前排序规则排序（用于读取后决定初始顺序）
+        /// </summary>
+        private List<NoteCard> SortNoteCards(List<NoteCard> cards)
+        {
+            return CurrentSort switch
+            {
+                SortOption.ByDateAsc => cards.OrderBy(c => c.createDate).ToList(),
+                SortOption.ByDateDesc => cards.OrderByDescending(c => c.createDate).ToList(),
+                //SortOption.ByPriorityAsc => cards.OrderBy(c => c.Priority).ToList(),
+                //SortOption.ByPriorityDesc => cards.OrderByDescending(c => c.Priority).ToList(),
+                _ => cards
+            };
+        }
+
+
 
         private void DumpJsonDebug(List<NoteCard> cards)
         {

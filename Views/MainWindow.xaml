@@ -99,8 +99,21 @@
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Button Style="{StaticResource CardButtonStyle}" Command="{Binding DataContext.ReplaceMainCard, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}">
-                                        <views:ThumbnailCard Type="{Binding Type}" CreateDate="{Binding CreateDate}" Title="{Binding Title}" ContentPreview="{Binding ContentPreview}" />
+                                    <Button Style="{StaticResource CardButtonStyle}" 
+                                            Command="{Binding DataContext.ReplaceMainCard, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                            CommandParameter="{Binding}">
+                                        <views:ThumbnailCard Type="{Binding Type}" 
+                                                             CreateDate="{Binding CreateDate}" 
+                                                             Title="{Binding Title}" 
+                                                             ContentPreview="{Binding ContentPreview}" />
+                                        <!-- 右键菜单：删除（使用 x:Reference MainWin 以跨可视树绑定到窗口 DataContext） -->
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="删除便签"
+                                                          Command="{Binding DataContext.DeleteCard, Source={x:Reference MainWin}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
