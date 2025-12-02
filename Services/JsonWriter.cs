@@ -54,6 +54,28 @@ namespace CyberNote.Services
             AppendNote(filePath, note);
         }
 
+        // 删除指定的记录
+        public static void DeleteNote(string filePath, string noteId)
+        {
+            if (string.IsNullOrWhiteSpace(noteId)) throw new ArgumentNullException(nameof(noteId));
+            var arr = LoadExistingArray(filePath);
+            bool removed = false;
+            for (int i = arr.Count - 1; i >= 0; i--)
+            {
+                if (arr[i] is JsonObject o &&
+                    ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == noteId) ||
+                     (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == noteId)))
+                {
+                    arr.RemoveAt(i);
+                    removed = true;
+                }
+            }
+            if (removed)
+            {
+                WriteArray(filePath, arr);
+            }
+        }
+
         private static JsonArray LoadExistingArray(string filePath)
         {
             if (!File.Exists(filePath)) return new JsonArray();
