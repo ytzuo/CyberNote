@@ -28,22 +28,30 @@
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
 
-        <!-- 激活状态边框样式触发器 -->
+        <!-- 激活状态边框样式触发器（保持尺寸不抖动：不再修改 BorderThickness） -->
         <Style x:Key="ThumbnailBorderStyle" TargetType="Border">
             <Setter Property="BorderBrush" Value="#E0E0E0"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="White"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                     <Setter Property="BorderBrush" Value="#4CAF50"/>
-                    <Setter Property="BorderThickness" Value="2"/>
-                    <Setter Property="Background" Value="#F4FFF6"/>
+                    <!-- 使用渐变背景突出选中而不改变尺寸 -->
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#F4FFF6" Offset="0"/>
+                                <GradientStop Color="#FFFFFF" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <Border Style="{StaticResource ThumbnailBorderStyle}" CornerRadius="8" Padding="12">
+    <Border Style="{StaticResource ThumbnailBorderStyle}" CornerRadius="8" Padding="12" MinHeight="110" MinWidth="160">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
