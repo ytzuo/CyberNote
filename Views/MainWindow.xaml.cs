@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using CyberNote.Services;
+using Microsoft.Win32;
 
 namespace CyberNote
 {
@@ -57,10 +58,16 @@ namespace CyberNote
             _lastLocation = new Point(Left, Top);
         }
 
-        private void FloatingButton_Click(object sender, RoutedEventArgs e)
+        private void FloatingAddButton_Click(object sender, RoutedEventArgs e)
         {
             // 切换类型选择 Popup 的显示状态
             TypeSelectorPopup.IsOpen = !TypeSelectorPopup.IsOpen;
+        }
+
+        private void FloatingOptionButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 切换类型选择 Popup 的显示状态
+            OptionPopup.IsOpen = !OptionPopup.IsOpen;
         }
 
         /// <summary>
@@ -88,6 +95,29 @@ namespace CyberNote
 
             // 关闭类型选择 Popup
             TypeSelectorPopup.IsOpen = false;
+        }
+
+        /// <summary>
+        /// 当用户选择修改数据文件路径时触发
+        /// </summary>
+        private void ChangePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog
+            {
+                Title = "选择便签数据 JSON 文件",
+                Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+            if (dlg.ShowDialog(this) == true)
+            {
+                if (DataContext is MainWindowViewModel vm)
+                {
+                    vm.DataFilePath = dlg.FileName;
+                    vm.ReloadData();
+                    OptionPopup.IsOpen = false;
+                }
+            }
         }
 
         private void CreateCommonNote(MainWindowViewModel vm)

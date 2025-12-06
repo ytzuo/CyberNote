@@ -4,39 +4,37 @@
              xmlns:local="clr-namespace:CyberNote"
              xmlns:converters="clr-namespace:CyberNote.Converters">
     <Application.Resources>
-        <!-- 细窄滚动条样式（稍微更明显） -->
+        <!-- 细窄滚动条样式（更明显，悬停仅改变颜色，颜色更浅以适配白色背景） -->
         <Style TargetType="ScrollBar" x:Key="ThinScrollBar">
-            <Setter Property="Width" Value="8"/>
+            <Setter Property="Width" Value="16"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#909090"/>
+            <Setter Property="Foreground" Value="#606060"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
                         <Grid>
-                            <Border Background="#08000000" CornerRadius="4"/>
-                            <Track x:Name="PART_Track" IsDirectionReversed="True" Focusable="False">
+                            <!-- 轨道：浅灰色更明显于白色背景 -->
+                            <Border Background="#FFF5F5F5" CornerRadius="6"/>
+                            <Track x:Name="PART_Track" Orientation="{TemplateBinding Orientation}" IsDirectionReversed="True" Focusable="False">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Background="Transparent" BorderThickness="0" IsTabStop="False"/>
+                                </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Background="#B0B0B0" Opacity="0.85">
+                                    <Thumb Background="#EEEEEE" Opacity="1" MinHeight="30" MinWidth="12" Margin="2" HorizontalAlignment="Stretch">
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
-                                                <Border x:Name="ThumbBorder" Background="{TemplateBinding Background}" CornerRadius="4"/>
+                                                <Border x:Name="ThumbBorder" Background="{TemplateBinding Background}" CornerRadius="6" BorderBrush="#999999" BorderThickness="1">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="4" ShadowDepth="0" Opacity="0.12"/>
+                                                    </Border.Effect>
+                                                </Border>
                                             </ControlTemplate>
                                         </Thumb.Template>
-                                        <Thumb.Style>
-                                            <Style TargetType="Thumb" BasedOn="{StaticResource {x:Type Thumb}}">
-                                                <Setter Property="Background" Value="#B0B0B0"/>
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" Value="#888888"/>
-                                                    </Trigger>
-                                                    <Trigger Property="IsDragging" Value="True">
-                                                        <Setter Property="Background" Value="#666666"/>
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Thumb.Style>
                                     </Thumb>
                                 </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Background="Transparent" BorderThickness="0" IsTabStop="False"/>
+                                </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
                     </ControlTemplate>
@@ -60,7 +58,10 @@
                             <ScrollBar Grid.Column="1" Name="PART_VerticalScrollBar"
                                        Orientation="Vertical"
                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                                       Style="{StaticResource ThinScrollBar}"/>
+                                       Style="{StaticResource ThinScrollBar}"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="ComputedVerticalScrollBarVisibility" Value="Collapsed">
