@@ -73,9 +73,8 @@ namespace CyberNote.Views
                 if (DataContext is CommonNote note)
             {
                 try
-                {
-                    //var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "test_json.json");
-                    var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+                {                 
+                    var path = ConfigService.DataFilePath;
                     var dir = Path.GetDirectoryName(path);
                     if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                         Directory.CreateDirectory(dir);
@@ -111,8 +110,7 @@ namespace CyberNote.Views
                 {
                     try
                     {
-                        //var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "test_json.json");
-                        var path = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+                        var path = ConfigService.DataFilePath;
                         var dir = Path.GetDirectoryName(path);
                         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                             Directory.CreateDirectory(dir);

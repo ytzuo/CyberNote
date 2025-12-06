@@ -124,7 +124,7 @@
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
-                            Click="FloatingButton_Click" 
+                            Click="FloatingAddButton_Click" 
                             HorizontalAlignment="Right" 
                             VerticalAlignment="Bottom" 
                             Margin="0,0,8,8" 
@@ -155,7 +155,7 @@
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
-                            Click="FloatingButton_Click" 
+                            Click="FloatingOptionButton_Click" 
                             HorizontalAlignment="Right" 
                             VerticalAlignment="Bottom" 
                             Margin="0,0,56,8" 
@@ -242,44 +242,43 @@
 
         <!-- ✅ 设置 Popup -->
         <Popup x:Name="OptionPopup" 
-       Placement="Bottom" 
-       PlacementTarget="{Binding ElementName=ExpendBtn}" 
-       VerticalOffset="5" 
-       HorizontalOffset="280"
-       StaysOpen="False" 
-       IsOpen="False" 
-       AllowsTransparency="True">
-            <Border Background="#FFFFFF" 
-            BorderBrush="#4CAF50" 
-            BorderThickness="2" 
-            CornerRadius="8" 
-            Padding="12" 
-            SnapsToDevicePixels="True">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" 
+            Placement="Bottom" 
+            PlacementTarget="{Binding ElementName=ExpendBtn}" 
+            VerticalOffset="5" 
+            HorizontalOffset="280"
+            StaysOpen="False" 
+            IsOpen="False" 
+            AllowsTransparency="True">
+                <Border Background="#FFFFFF" 
+                    BorderBrush="#4CAF50" 
+                    BorderThickness="2" 
+                    CornerRadius="8" 
+                    Padding="12" 
+                    SnapsToDevicePixels="True">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" 
                               BlurRadius="10" 
                               ShadowDepth="2" 
                               Opacity="0.3"/>
-                </Border.Effect>
-                <StackPanel>
-                    <TextBlock Text="选择卡片类型" 
-                       FontWeight="Bold" 
-                       FontSize="14" 
-                       Foreground="#333" 
-                       Margin="0,0,0,10"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="选择卡片类型" 
+                            FontWeight="Bold" 
+                            FontSize="14" 
+                            Foreground="#333" 
+                            Margin="0,0,0,10"/>
 
-                    <!-- 任务列表类型 -->
-                    <Button Style="{StaticResource FlatButton}" 
-                    Height="40"
-                    Tag="List"
-                    Click="CardTypeButton_Click">
+                        <!-- 修改文件路径 -->
+                        <Button Style="{StaticResource FlatButton}" 
+                                Height="40"
+                                Tag="List"
+                                Click="ChangePathButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📄" FontSize="18" Margin="0,0,8,0"/>
                             <TextBlock Text="修改便签文件路径" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <!-- 可以继续添加更多类型 -->
                 </StackPanel>
             </Border>
         </Popup>

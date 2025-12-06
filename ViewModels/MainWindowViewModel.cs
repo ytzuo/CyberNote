@@ -26,8 +26,17 @@ namespace CyberNote.ViewModels
 
         public ICommand DeleteCard { get; }
 
-        // 暴露数据文件路径，供保存使用
-        public string DataFilePath { get; } = "C:\\Users\\zz\\Desktop\\Code\\C#\\CyberNote\\Data\\test_json.json";
+        // 暴露数据文件路径，供保存使用（从配置服务读取/持久化）
+        public string DataFilePath
+        {
+            get => ConfigService.DataFilePath;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value)) return;
+                ConfigService.DataFilePath = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DataFilePath)));
+            }
+        }
 
         private void ExecuteAddNewCard()
         {
@@ -160,32 +169,13 @@ namespace CyberNote.ViewModels
             };
         }
 
-
-
-        private void DumpJsonDebug(List<NoteCard> cards)
+        /// <summary>
+        /// 重新从当前数据文件读取并刷新 UI
+        /// </summary>
+        public void ReloadData()
         {
-            Debug.WriteLine("================ DESERIALIZE ================");
-            Debug.WriteLine($"总计反序列化笔记数: {cards.Count}");
-
-            foreach (var card in cards)
-            {
-                if (card is CommonNote cn)
-                {
-                    Debug.WriteLine($"[Common] Id={cn.Id} Title={cn.Title} createDate={cn.createDate:yyyy-MM-dd HH:mm:ss} Priority={cn.Priority} Progress={(cn.Progress ? "完成" : "未完成")} Content='{cn.Content}'");
-                }
-                else if (card is ListNote ln)
-                {
-                    Debug.WriteLine($"[List] Id={ln.Id} Title={ln.Title} createDate={ln.createDate:yyyy-MM-dd HH:mm:ss} Priority={ln.Priority} Tasks={ln.Tasks.Count} Content='{ln.Content}'");
-                    int i = 1;
-                    foreach (var t in ln.Tasks)
-                        Debug.WriteLine($"   - Task#{i++}: {(t.Progress ? "完成" : "未完成")} | {t.Content}");
-                }
-                else
-                {
-                    Debug.WriteLine($"[未知类型] Type={card.Type} Title={card.Title}");
-                }
-            }
-            Debug.WriteLine("================ END DEBUG ================");
+            ThumbnailCards.Clear();
+            LoadCard();
         }
     }
 }
