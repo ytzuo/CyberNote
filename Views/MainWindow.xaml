@@ -82,9 +82,9 @@
 
         <!-- ✅ 用 Popup 实现“外部更宽面板” -->
         <Popup x:Name="WidePopup" Placement="Bottom" PlacementTarget="{Binding ElementName=ExpendBtn}" VerticalOffset="5" StaysOpen="True" IsOpen="False" AllowsTransparency="True">
-            <Border Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True">
+            <Border Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True" MaxHeight="320">
                 <Grid>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" MaxHeight="280" CanContentScroll="False">
                         <ItemsControl ItemsSource="{Binding ThumbnailCards}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -149,6 +149,37 @@
                         </Button.Template>
                         <TextBlock Text="＋" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
+
+                    <!-- 悬浮修改文件路径按钮 -->
+                    <Button Background="#4CAF50" 
+                            Width="40" 
+                            Height="40" 
+                            BorderThickness="0"
+                            Click="FloatingButton_Click" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Bottom" 
+                            Margin="0,0,56,8" 
+                            Panel.ZIndex="1" 
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" 
+                                        CornerRadius="20" 
+                                        SnapsToDevicePixels="True">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#45A049"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#3D8B40"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock Text="⚙️" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
                 </Grid>
             </Border>
         </Popup>
@@ -204,6 +235,50 @@
                         </StackPanel>
                     </Button>
                     
+                    <!-- 可以继续添加更多类型 -->
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!-- ✅ 设置 Popup -->
+        <Popup x:Name="OptionPopup" 
+       Placement="Bottom" 
+       PlacementTarget="{Binding ElementName=ExpendBtn}" 
+       VerticalOffset="5" 
+       HorizontalOffset="280"
+       StaysOpen="False" 
+       IsOpen="False" 
+       AllowsTransparency="True">
+            <Border Background="#FFFFFF" 
+            BorderBrush="#4CAF50" 
+            BorderThickness="2" 
+            CornerRadius="8" 
+            Padding="12" 
+            SnapsToDevicePixels="True">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" 
+                              BlurRadius="10" 
+                              ShadowDepth="2" 
+                              Opacity="0.3"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="选择卡片类型" 
+                       FontWeight="Bold" 
+                       FontSize="14" 
+                       Foreground="#333" 
+                       Margin="0,0,0,10"/>
+
+                    <!-- 任务列表类型 -->
+                    <Button Style="{StaticResource FlatButton}" 
+                    Height="40"
+                    Tag="List"
+                    Click="CardTypeButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📄" FontSize="18" Margin="0,0,8,0"/>
+                            <TextBlock Text="修改便签文件路径" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- 可以继续添加更多类型 -->
                 </StackPanel>
             </Border>
