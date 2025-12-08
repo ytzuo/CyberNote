@@ -1,6 +1,7 @@
 ﻿using CyberNote.Models;
 using CyberNote.Services;
 using CyberNote.UI;
+using CyberNote.Views;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
@@ -155,8 +156,20 @@ namespace CyberNote.ViewModels
         public SortOption CurrentSort { get; set; } = SortOption.ByDateDesc;
 
         /// <summary>
-        /// 对 NoteCard 列表按当前排序规则排序（用于读取后决定初始顺序）
+        /// 对 ThumbnailCardViewModel 列表按当前排序规则排序
         /// </summary>
+        private List<ThumbnailCardViewModel> SortNoteCards(ObservableCollection<ThumbnailCardViewModel> cards)
+        {
+            return CurrentSort switch
+            {
+                SortOption.ByDateAsc => cards.OrderBy(c => c.CreateDate).ToList(),
+                SortOption.ByDateDesc => cards.OrderByDescending(c => c.CreateDate).ToList(),
+                //SortOption.ByPriorityAsc => cards.OrderBy(c => c.Priority).ToList(),
+                //SortOption.ByPriorityDesc => cards.OrderByDescending(c => c.Priority).ToList(),
+                _ => cards.ToList()
+            };
+        }
+
         private List<NoteCard> SortNoteCards(List<NoteCard> cards)
         {
             return CurrentSort switch
@@ -176,6 +189,26 @@ namespace CyberNote.ViewModels
         {
             ThumbnailCards.Clear();
             LoadCard();
+        }
+
+        /// <summary>
+        /// 按日期排序的切换（升序/降序）
+        /// </summary>
+        public void ToggleSortDate()
+        {
+            CurrentSort = CurrentSort == SortOption.ByDateDesc ? SortOption.ByDateAsc : SortOption.ByDateDesc;
+            // 重新排序现有卡片       
+            var sortedNotes = SortNoteCards(ThumbnailCards);
+            ThumbnailCards.Clear();
+            foreach (var note in sortedNotes)
+            {
+                ThumbnailCards.Add(note);
+            }
+            // 如果需要，更新当前激活卡片
+            if (ThumbnailCards.Any())
+            {
+                ExecuteReplaceMainCard(ThumbnailCards.First());
+            }
         }
     }
 }

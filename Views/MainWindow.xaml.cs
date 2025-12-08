@@ -184,7 +184,10 @@ namespace CyberNote
         {
             _sortDescending = !_sortDescending;
             SortDateText.Text = _sortDescending ? "降序" : "升序";
-            // TODO: 实现排序逻辑
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.ToggleSortDate();
+            }
         }
     }
 }
