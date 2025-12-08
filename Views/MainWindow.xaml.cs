@@ -1,9 +1,10 @@
-﻿using CyberNote.ViewModels;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
-using CyberNote.Services;
+﻿using CyberNote.Services;
+using CyberNote.ViewModels;
 using Microsoft.Win32;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace CyberNote
 {
@@ -109,12 +110,28 @@ namespace CyberNote
                 CheckFileExists = true,
                 Multiselect = false
             };
+
+            // 设置默认打开路径为当前数据文件的目录
+            if (DataContext is MainWindowViewModel vm && !string.IsNullOrWhiteSpace(vm.DataFilePath))
+            {
+                var dir = Path.GetDirectoryName(vm.DataFilePath);
+                if (!string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir))
+                {
+                    dlg.InitialDirectory = dir;
+                }
+            }
+            else
+            {
+                // 可选：如果没有当前路径，设置为用户文档文件夹
+                dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+
             if (dlg.ShowDialog(this) == true)
             {
-                if (DataContext is MainWindowViewModel vm)
+                if (DataContext is MainWindowViewModel mvm)
                 {
-                    vm.DataFilePath = dlg.FileName;
-                    vm.ReloadData();
+                    mvm.DataFilePath = dlg.FileName;
+                    mvm.ReloadData();
                     OptionPopup.IsOpen = false;
                 }
             }
