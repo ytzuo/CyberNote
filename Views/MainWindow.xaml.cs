@@ -1,9 +1,10 @@
-﻿using CyberNote.ViewModels;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
-using CyberNote.Services;
+﻿using CyberNote.Services;
+using CyberNote.ViewModels;
 using Microsoft.Win32;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace CyberNote
 {
@@ -109,12 +110,28 @@ namespace CyberNote
                 CheckFileExists = true,
                 Multiselect = false
             };
+
+            // 设置默认打开路径为当前数据文件的目录
+            if (DataContext is MainWindowViewModel vm && !string.IsNullOrWhiteSpace(vm.DataFilePath))
+            {
+                var dir = Path.GetDirectoryName(vm.DataFilePath);
+                if (!string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir))
+                {
+                    dlg.InitialDirectory = dir;
+                }
+            }
+            else
+            {
+                // 可选：如果没有当前路径，设置为用户文档文件夹
+                dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+
             if (dlg.ShowDialog(this) == true)
             {
-                if (DataContext is MainWindowViewModel vm)
+                if (DataContext is MainWindowViewModel mvm)
                 {
-                    vm.DataFilePath = dlg.FileName;
-                    vm.ReloadData();
+                    mvm.DataFilePath = dlg.FileName;
+                    mvm.ReloadData();
                     OptionPopup.IsOpen = false;
                 }
             }
@@ -158,6 +175,56 @@ namespace CyberNote
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
                 vm.ReplaceMainCard.Execute(newCard);
+        }
+
+        // 当前筛选类型状态（0=全部, 1=随手记, 2=任务列表）
+        private int _filterTypeState = 0;
+        private readonly string[] _filterTypeLabels = { "全部", "随手记", "任务列表" };
+
+        // 当前排序状态（true=降序, false=升序）
+        private bool _sortDescending = true;
+
+        /// <summary>
+        /// 按种类筛选按钮点击：循环切换（全部 → 随手记 → 任务列表 → 全部...）
+        /// </summary>
+        private void FilterTypeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.FilterType = vm.FilterType switch
+                {
+                    "All" => "Common",
+                    "Common" => "List",
+                    "List" => "All",
+                    _ => "All"
+                };
+                FilterTypeText.Text = vm.FilterType switch
+                {
+                    "All" => "全部",
+                    "Common" => "随手记",
+                    "List" => "任务列表",
+                    _ => "全部"
+                };
+                typeFont.Text = vm.FilterType switch
+                {
+                    "All" => "≡",       // 所有类型图标
+                    "Common" => "📝",    // 随手记图标
+                    "List" => "✓",      // 任务列表图标
+                    _ => "≡"
+                };
+            }
+        }
+
+        /// <summary>
+        /// 按日期排序按钮点击：切换升序/降序
+        /// </summary>
+        private void SortDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.ToggleSortDate();
+                SortDateText.Text = vm.CurrentSort == CyberNote.ViewModels.MainWindowViewModel.SortOption.ByDateDesc ? "降序" : "升序";
+            }
         }
     }
 }
