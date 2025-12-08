@@ -159,5 +159,32 @@ namespace CyberNote
             if (vm.ReplaceMainCard.CanExecute(newCard))
                 vm.ReplaceMainCard.Execute(newCard);
         }
+
+        // 当前筛选类型状态（0=全部, 1=随手记, 2=任务列表）
+        private int _filterTypeState = 0;
+        private readonly string[] _filterTypeLabels = { "全部", "随手记", "任务列表" };
+
+        // 当前排序状态（true=降序, false=升序）
+        private bool _sortDescending = true;
+
+        /// <summary>
+        /// 按种类筛选按钮点击：循环切换（全部 → 随手记 → 任务列表 → 全部...）
+        /// </summary>
+        private void FilterTypeButton_Click(object sender, RoutedEventArgs e)
+        {
+            _filterTypeState = (_filterTypeState + 1) % _filterTypeLabels.Length;
+            FilterTypeText.Text = _filterTypeLabels[_filterTypeState];
+            // TODO: 实现筛选逻辑
+        }
+
+        /// <summary>
+        /// 按日期排序按钮点击：切换升序/降序
+        /// </summary>
+        private void SortDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            _sortDescending = !_sortDescending;
+            SortDateText.Text = _sortDescending ? "降序" : "升序";
+            // TODO: 实现排序逻辑
+        }
     }
 }

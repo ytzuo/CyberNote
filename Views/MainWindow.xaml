@@ -80,11 +80,75 @@
             </Grid>
         </Border>
 
-        <!-- ✅ 用 Popup 实现“外部更宽面板” -->
+        <!-- ✅ 用 Popup 实现"外部更宽面板" -->
         <Popup x:Name="WidePopup" Placement="Bottom" PlacementTarget="{Binding ElementName=ExpendBtn}" VerticalOffset="5" StaysOpen="True" IsOpen="False" AllowsTransparency="True">
-            <Border Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True" MaxHeight="320">
+            <Border Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True" MaxHeight="400">
                 <Grid>
-                    <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" MaxHeight="280" CanContentScroll="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- ✅ 顶部搜索栏与筛选/排序按钮 -->
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- 搜索框 -->
+                        <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4" Background="#FAFAFA" Margin="0,0,8,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🔍" FontSize="14" VerticalAlignment="Center" Margin="6,0,4,0" Foreground="#888"/>
+                                <TextBox x:Name="SearchBox" 
+                                         Grid.Column="1" 
+                                         BorderThickness="0" 
+                                         Background="Transparent" 
+                                         VerticalAlignment="Center" 
+                                         FontSize="13" 
+                                         Padding="4,6"
+                                         Text=""
+                                         ToolTip="搜索标题或内容"/>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- 按种类筛选按钮（点击循环切换：全部 → 随手记 → 任务列表 → 全部...） -->
+                        <Button x:Name="FilterTypeButton" 
+                                Grid.Column="1" 
+                                Style="{StaticResource FlatButton}" 
+                                Width="80" 
+                                Height="28" 
+                                Margin="0,0,4,0"
+                                Click="FilterTypeButton_Click"
+                                ToolTip="按种类筛选（点击切换）">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📋" FontSize="12" Margin="0,0,4,0"/>
+                                <TextBlock x:Name="FilterTypeText" Text="全部" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <!-- 按日期排序按钮（点击切换：降序 ↔ 升序） -->
+                        <Button x:Name="SortDateButton" 
+                                Grid.Column="2" 
+                                Style="{StaticResource FlatButton}" 
+                                Width="80" 
+                                Height="28"
+                                Click="SortDateButton_Click"
+                                ToolTip="按日期排序（点击切换）">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📅" FontSize="12" Margin="0,0,4,0"/>
+                                <TextBlock x:Name="SortDateText" Text="降序" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- 卡片列表 -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" MaxHeight="280" CanContentScroll="False">
                         <ItemsControl ItemsSource="{Binding ThumbnailCards}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -119,8 +183,9 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
+
                     <!-- 悬浮新增按钮 -->
-                    <Button Background="#4CAF50" 
+                    <Button Grid.Row="1" Background="#4CAF50" 
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
@@ -151,7 +216,7 @@
                     </Button>
 
                     <!-- 悬浮修改文件路径按钮 -->
-                    <Button Background="#4CAF50" 
+                    <Button Grid.Row="1" Background="#4CAF50" 
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
