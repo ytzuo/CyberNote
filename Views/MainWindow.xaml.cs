@@ -172,9 +172,23 @@ namespace CyberNote
         /// </summary>
         private void FilterTypeButton_Click(object sender, RoutedEventArgs e)
         {
-            _filterTypeState = (_filterTypeState + 1) % _filterTypeLabels.Length;
-            FilterTypeText.Text = _filterTypeLabels[_filterTypeState];
-            // TODO: 实现筛选逻辑
+            if (DataContext is MainWindowViewModel vm)
+            {
+                vm.FilterType = vm.FilterType switch
+                {
+                    "All" => "Common",
+                    "Common" => "List",
+                    "List" => "All",
+                    _ => "All"
+                };
+                FilterTypeText.Text = vm.FilterType switch
+                {
+                    "All" => "全部",
+                    "Common" => "随手记",
+                    "List" => "任务列表",
+                    _ => "全部"
+                };
+            }
         }
 
         /// <summary>
@@ -182,11 +196,10 @@ namespace CyberNote
         /// </summary>
         private void SortDateButton_Click(object sender, RoutedEventArgs e)
         {
-            _sortDescending = !_sortDescending;
-            SortDateText.Text = _sortDescending ? "降序" : "升序";
             if (DataContext is MainWindowViewModel vm)
             {
                 vm.ToggleSortDate();
+                SortDateText.Text = vm.CurrentSort == CyberNote.ViewModels.MainWindowViewModel.SortOption.ByDateDesc ? "降序" : "升序";
             }
         }
     }

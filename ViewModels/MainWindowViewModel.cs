@@ -20,6 +20,37 @@ namespace CyberNote.ViewModels
     internal class MainWindowViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<ThumbnailCardViewModel> ThumbnailCards { get; } = new ObservableCollection<ThumbnailCardViewModel>();
+        public ObservableCollection<ThumbnailCardViewModel> FilteredThumbnailCards { get; } = new ObservableCollection<ThumbnailCardViewModel>();
+
+        private string _searchText = string.Empty;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText != value)
+                {
+                    _searchText = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchText)));
+                    ApplyFilters();
+                }
+            }
+        }
+
+        private string _filterType = "All"; // "All", "Common", "List"
+        public string FilterType
+        {
+            get => _filterType;
+            set
+            {
+                if (_filterType != value)
+                {
+                    _filterType = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FilterType)));
+                    ApplyFilters();
+                }
+            }
+        }
 
         public ICommand AddNewCardCommand { get; }
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -140,7 +171,8 @@ namespace CyberNote.ViewModels
             }
 
             ExecuteReplaceMainCard(ThumbnailCards.First());
-            //DumpJsonDebug(cards);
+            // 初始化筛选后的列表
+            ApplyFilters();
         }
 
         // 排序选项（可扩展）
@@ -197,17 +229,54 @@ namespace CyberNote.ViewModels
         public void ToggleSortDate()
         {
             CurrentSort = CurrentSort == SortOption.ByDateDesc ? SortOption.ByDateAsc : SortOption.ByDateDesc;
-            // 重新排序现有卡片       
-            var sortedNotes = SortNoteCards(ThumbnailCards);
+            // 重新排序现有卡片
+            var sorted = SortNoteCards(ThumbnailCards);
             ThumbnailCards.Clear();
-            foreach (var note in sortedNotes)
+            foreach (var vm in sorted)
             {
-                ThumbnailCards.Add(note);
+                ThumbnailCards.Add(vm);
             }
+            // 应用筛选和排序
+            ApplyFilters();
             // 如果需要，更新当前激活卡片
-            if (ThumbnailCards.Any())
+            if (FilteredThumbnailCards.Any())
             {
-                ExecuteReplaceMainCard(ThumbnailCards.First());
+                ExecuteReplaceMainCard(FilteredThumbnailCards.First());
+            }
+        }
+
+        /// <summary>
+        /// 应用筛选和排序
+        /// </summary>
+        private void ApplyFilters()
+        {
+            var filtered = ThumbnailCards.AsEnumerable();
+
+            // 搜索筛选
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                filtered = filtered.Where(vm => vm.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                vm.ContentPreview.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // 类型筛选
+            if (FilterType != "All")
+            {
+                filtered = filtered.Where(vm => vm.Type == FilterType);
+            }
+
+            // 排序
+            filtered = CurrentSort switch
+            {
+                SortOption.ByDateAsc => filtered.OrderBy(vm => vm.CreateDate),
+                SortOption.ByDateDesc => filtered.OrderByDescending(vm => vm.CreateDate),
+                _ => filtered
+            };
+
+            FilteredThumbnailCards.Clear();
+            foreach (var vm in filtered)
+            {
+                FilteredThumbnailCards.Add(vm);
             }
         }
     }

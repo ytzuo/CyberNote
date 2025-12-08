@@ -98,7 +98,7 @@
                         </Grid.ColumnDefinitions>
                         
                         <!-- 搜索框 -->
-                        <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4" Background="#FAFAFA" Margin="0,0,8,0">
+                        <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4" Background="#FAFAFA" Margin="0,0,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -112,7 +112,7 @@
                                          VerticalAlignment="Center" 
                                          FontSize="13" 
                                          Padding="4,6"
-                                         Text=""
+                                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="搜索标题或内容"/>
                             </Grid>
                         </Border>
@@ -149,7 +149,7 @@
 
                     <!-- 卡片列表 -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" MaxHeight="280" CanContentScroll="False">
-                        <ItemsControl ItemsSource="{Binding ThumbnailCards}">
+                        <ItemsControl ItemsSource="{Binding FilteredThumbnailCards}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <!-- 每行两个缩略卡片 -->
