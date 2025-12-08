@@ -127,7 +127,7 @@
                                 Click="FilterTypeButton_Click"
                                 ToolTip="按种类筛选（点击切换）">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📋" FontSize="12" Margin="0,0,4,0"/>
+                                <TextBlock x:Name="typeFont" Text="≡" FontSize="12" Margin="0,0,4,0"/>
                                 <TextBlock x:Name="FilterTypeText" Text="全部" FontSize="12" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
