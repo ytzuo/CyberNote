@@ -20,7 +20,7 @@ namespace CyberNote.Views
     /// <summary>
     /// ListCardView.xaml 的交互逻辑
     /// </summary>
-    public partial class ListCardView : UserControl
+    public partial class ListCardView : System.Windows.Controls.UserControl
     {
 
         public ListCardView()

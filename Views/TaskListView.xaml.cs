@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace CyberNote.Views
 {
-    public partial class TaskListView : UserControl
+    public partial class TaskListView : System.Windows.Controls.UserControl
     {
         // 依赖属性：Tasks 集合，显式绑定任务列表
         public static readonly DependencyProperty TasksProperty = DependencyProperty.Register(
@@ -59,7 +59,7 @@ namespace CyberNote.Views
         // 失去焦点时退出编辑模式并保存
         private void TaskEdit_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox tb && tb.DataContext is TaskItem task)
+            if (sender is System.Windows.Controls.TextBox tb && tb.DataContext is TaskItem task)
             {
                 task.IsEditing = false;
                 SaveCurrentListNote();

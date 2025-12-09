@@ -7,7 +7,7 @@ namespace CyberNote.Views
     /// <summary>
     /// 缩略图卡片控件 - 符合 MVVM 的可复用控件
     /// </summary>
-    public partial class ThumbnailCard : UserControl
+    public partial class ThumbnailCard : System.Windows.Controls.UserControl
     {
         // 依赖属性：笔记类型
         public static readonly DependencyProperty TypeProperty =

@@ -13,7 +13,7 @@ namespace CyberNote.Views
     /// <summary>
     /// CommonCardView.xaml 的交互逻辑
     /// </summary>
-    public partial class CommonCardView : UserControl, INotifyPropertyChanged
+    public partial class CommonCardView : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
         private bool _isEditMode = false;
         
@@ -97,7 +97,7 @@ namespace CyberNote.Views
         /// <summary>
         /// 按 Esc 保存并退出编辑模式（使用已有 AppendNote 实现）
         /// </summary>
-        private void EditElement_KeyDown(object sender, KeyEventArgs e)
+        private void EditElement_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
            if (e.Key == Key.Escape)
             {
