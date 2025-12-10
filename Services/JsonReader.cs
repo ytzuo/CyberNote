@@ -58,8 +58,8 @@ namespace CyberNote.Services
             catch (Exception)
             {
                 // JSON 解析失败：提示并让用户选择新的 JSON 文件
-                MessageBox.Show("JSON 文件无效或已损坏，请选择一个有效的 JSON 文件。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Warning);
-                var dlg = new OpenFileDialog
+                System.Windows.MessageBox.Show("JSON 文件无效或已损坏，请选择一个有效的 JSON 文件。", "读取失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                var dlg = new Microsoft.Win32.OpenFileDialog
                 {
                     Title = "选择便签数据 JSON 文件",
                     Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",

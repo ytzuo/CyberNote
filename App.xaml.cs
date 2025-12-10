@@ -7,7 +7,7 @@ namespace CyberNote
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         // App.xaml.cs
         protected override void OnStartup(StartupEventArgs e)

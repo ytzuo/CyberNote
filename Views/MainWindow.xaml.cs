@@ -5,6 +5,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Forms;
+using System.Drawing;
 
 namespace CyberNote
 {
@@ -13,12 +15,37 @@ namespace CyberNote
     /// </summary>
     public partial class MainWindow : Window
     {
+        private NotifyIcon _notifyIcon;
+        private bool _isExit;
+        private ToolStripMenuItem _showHideMenuItem;
         //private MainWindowViewModel vm;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
-            // 不再需要 SetToDesktop，使用 Topmost 实现组件效果
+            _notifyIcon = new NotifyIcon();
+            try
+            {
+                _notifyIcon.Icon = new Icon("../../../Source/Icon/favicon.ico"); // 尝试加载自定义.ico图标
+            }
+            catch
+            {
+                _notifyIcon.Icon = SystemIcons.Application; // 如果失败，使用默认图标
+            }
+            _notifyIcon.Text = "CyberNote";
+            _notifyIcon.Visible = true;
+
+            // 创建右键菜单
+            var contextMenu = new ContextMenuStrip();
+            _showHideMenuItem = new ToolStripMenuItem("隐藏", null, ShowHideWindow);
+            contextMenu.Items.Add(_showHideMenuItem);
+            contextMenu.Items.Add("退出", null, (s, e) => { _isExit = true; Close(); });
+            _notifyIcon.ContextMenuStrip = contextMenu;
+
+            // 双击托盘图标显示窗口
+            _notifyIcon.DoubleClick += (s, e) => { Show(); WindowState = WindowState.Normal; Activate(); };
+
+            SetAutoStart();
         }
 
         /// <summary>
@@ -44,7 +71,7 @@ namespace CyberNote
                 WidePopup.IsOpen = false;
                 WidePopup.IsOpen = true;
             }
-            _lastLocation = new Point(Left, Top);
+            _lastLocation = new System.Windows.Point(Left, Top);
         }
         private void ExtendBtn_Clicked(object sender, RoutedEventArgs e)
         {
@@ -53,10 +80,10 @@ namespace CyberNote
         }
 
         // 窗口加载时记录初始位置
-        private Point _lastLocation;
+        private System.Windows.Point _lastLocation;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _lastLocation = new Point(Left, Top);
+            _lastLocation = new System.Windows.Point(Left, Top);
         }
 
         private void FloatingAddButton_Click(object sender, RoutedEventArgs e)
@@ -103,7 +130,7 @@ namespace CyberNote
         /// </summary>
         private void ChangePathButton_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog
+            var dlg = new Microsoft.Win32.OpenFileDialog
             {
                 Title = "选择便签数据 JSON 文件",
                 Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",
@@ -224,6 +251,48 @@ namespace CyberNote
             {
                 vm.ToggleSortDate();
                 SortDateText.Text = vm.CurrentSort == CyberNote.ViewModels.MainWindowViewModel.SortOption.ByDateDesc ? "降序" : "升序";
+            }
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+            // 如果不是主动退出（如通过菜单项点关闭），则隐藏窗口
+            if (!_isExit)
+            {
+                e.Cancel = true; // 取消关闭事件
+                Hide();
+            }
+            else
+            {
+                _notifyIcon.Dispose();
+            }
+        }
+
+        private void SetAutoStart()
+        {
+            try
+            {
+                var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                var appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                key?.SetValue("CyberNote", $"\"{appPath}\"");
+            }
+            catch { }
+        }
+
+        private void ShowHideWindow(object sender, EventArgs e)
+        {
+            if (IsVisible)
+            {
+                Hide();
+                _showHideMenuItem.Text = "显示";
+            }
+            else
+            {
+                Show();
+                WindowState = WindowState.Normal;
+                Activate();
+                _showHideMenuItem.Text = "隐藏";
             }
         }
     }
