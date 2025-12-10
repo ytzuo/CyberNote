@@ -17,19 +17,28 @@ namespace CyberNote
     {
         private NotifyIcon _notifyIcon;
         private bool _isExit;
+        private ToolStripMenuItem _showHideMenuItem;
         //private MainWindowViewModel vm;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
             _notifyIcon = new NotifyIcon();
-            _notifyIcon.Icon = SystemIcons.Application; // 你可以替换为自定义图标
+            try
+            {
+                _notifyIcon.Icon = new Icon("../../../Source/Icon/favicon.ico"); // 尝试加载自定义.ico图标
+            }
+            catch
+            {
+                _notifyIcon.Icon = SystemIcons.Application; // 如果失败，使用默认图标
+            }
             _notifyIcon.Text = "CyberNote";
             _notifyIcon.Visible = true;
 
             // 创建右键菜单
             var contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add("显示", null, (s, e) => { Show(); WindowState = WindowState.Normal; Activate(); });
+            _showHideMenuItem = new ToolStripMenuItem("隐藏", null, ShowHideWindow);
+            contextMenu.Items.Add(_showHideMenuItem);
             contextMenu.Items.Add("退出", null, (s, e) => { _isExit = true; Close(); });
             _notifyIcon.ContextMenuStrip = contextMenu;
 
@@ -269,6 +278,22 @@ namespace CyberNote
                 key?.SetValue("CyberNote", $"\"{appPath}\"");
             }
             catch { }
+        }
+
+        private void ShowHideWindow(object sender, EventArgs e)
+        {
+            if (IsVisible)
+            {
+                Hide();
+                _showHideMenuItem.Text = "显示";
+            }
+            else
+            {
+                Show();
+                WindowState = WindowState.Normal;
+                Activate();
+                _showHideMenuItem.Text = "隐藏";
+            }
         }
     }
 }
