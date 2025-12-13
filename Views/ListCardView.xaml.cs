@@ -22,6 +22,18 @@ namespace CyberNote.Views
     /// </summary>
     public partial class ListCardView : System.Windows.Controls.UserControl
     {
+        public static readonly DependencyProperty IsTitleEditModeProperty =
+            DependencyProperty.Register(
+                nameof(IsTitleEditMode),
+                typeof(bool),
+                typeof(ListCardView),
+                new PropertyMetadata(false));
+
+        public bool IsTitleEditMode
+        {
+            get => (bool)GetValue(IsTitleEditModeProperty);
+            set => SetValue(IsTitleEditModeProperty, value);
+        }
 
         public ListCardView()
         {
@@ -32,6 +44,35 @@ namespace CyberNote.Views
         {
             InitializeComponent();
             DataContext = note ?? throw new ArgumentNullException(nameof(note));
+        }
+
+        private void TitleTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            IsTitleEditMode = true;
+            Dispatcher.BeginInvoke(new Action(() => 
+            {
+                var titleBox = FindName("TitleTextBox") as System.Windows.Controls.TextBox;
+                titleBox?.Focus();
+            }), DispatcherPriority.Background);
+        }
+
+        private void TitleTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            IsTitleEditMode = false;
+        }
+
+        private void TitleTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                IsTitleEditMode = false;
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                IsTitleEditMode = false;
+                e.Handled = true;
+            }
         }
 
         private void AddTaskBtn_Clicked(object sender, RoutedEventArgs e)

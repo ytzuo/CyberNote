@@ -177,7 +177,16 @@ namespace CyberNote
                 Title = note.Title,
             };
             newCard.BuildContentPreview();
-            vm.ThumbnailCards.Add(newCard);
+            
+            // 插入到正确位置（降序时在开头）
+            vm.ThumbnailCards.Insert(0, newCard);
+            JsonWriter.AppendNote(vm.DataFilePath, note);
+            
+            // 手动更新 FilteredThumbnailCards
+            if (vm.FilterType == "All" || vm.FilterType == note.Type)
+            {
+                vm.FilteredThumbnailCards.Insert(0, newCard);
+            }
             
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
@@ -198,7 +207,16 @@ namespace CyberNote
                 Title = note.Title,
             };
             newCard.BuildContentPreview();
-            vm.ThumbnailCards.Add(newCard);
+            
+            // 插入到正确位置（降序时在开头）
+            vm.ThumbnailCards.Insert(0, newCard);
+            JsonWriter.AppendNote(vm.DataFilePath, note);
+            
+            // 手动更新 FilteredThumbnailCards
+            if (vm.FilterType == "All" || vm.FilterType == note.Type)
+            {
+                vm.FilteredThumbnailCards.Insert(0, newCard);
+            }
             
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
