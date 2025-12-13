@@ -83,6 +83,7 @@ namespace CyberNote.ViewModels
             };
             newCard.BuildContentPreview();
             ThumbnailCards.Add(newCard);
+            JsonWriter.AppendNote(DataFilePath, note);
             Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
         }
 
@@ -128,7 +129,8 @@ namespace CyberNote.ViewModels
             }
             else if (ThumbnailCards.Count == 0)
             {
-                MainCardElement = null; // 没有卡片时清空主卡片显示
+                ExecuteAddNewCard();
+                ExecuteReplaceMainCard(ThumbnailCards.First());
             }
         }
 
@@ -170,6 +172,10 @@ namespace CyberNote.ViewModels
                 ThumbnailCards.Add(vm);
             }
 
+            if (ThumbnailCards.Count == 0)
+            {
+                ExecuteAddNewCard();
+            }
             ExecuteReplaceMainCard(ThumbnailCards.First());
             // 初始化筛选后的列表
             ApplyFilters();

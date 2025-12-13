@@ -1,108 +1,22 @@
 [
   {
-    "Id": "728bf9e9-b5de-4f86-b5a8-f0a1220eac31",
+    "id": "32538800-1779-4b51-8dd8-0e2c9f193003",
     "Type": "Common",
-    "Title": "开会",
-    "Schedule": "2025-11-21T10:00:00",
-    "createDate": "0001-01-01T00:00:00",
+    "Title": "新笔记标题",
+    "Schedule": "2025-12-13T23:04:52.3342566+08:00",
+    "createDate": "2025-12-13T23:04:52.3344953+08:00",
     "Progress": false,
-    "Priority": 2,
-    "Content": "和周会资料"
+    "Priority": 0,
+    "Content": "点击编辑内容...\n第二行示例"
   },
   {
-    "id": "7c3ffca0-614e-4e97-af0f-73e61ab0da02",
-    "Type": "List",
-    "Title": "Bug 修复",
-    "Content": "客户反馈的高优问题",
-    "createDate": "2025-11-16T14:20:00",
-    "Priority": 5,
-    "Tasks": [
-      {
-        "Content": "修复启动闪退",
-        "Progress": true
-      },
-      {
-        "Content": "修复深色模式字体看不清",
-        "Progress": true
-      },
-      {
-        "Content": "修复任务勾选后未刷新",
-        "Progress": false
-      },
-      {
-        "Content": "新任务",
-        "Progress": false
-      }
-    ]
-  },
-  {
-    "id": "664a7b22-d54b-4a74-9e2e-7029356bf9ce",
-    "Type": "List",
-    "Title": "购物清单",
-    "Content": "周末去超市记得带环保袋",
-    "createDate": "2025-11-17T19:30:00",
-    "Priority": 1,
-    "Tasks": [
-      {
-        "Content": "牛奶 2 瓶",
-        "Progress": true
-      },
-      {
-        "Content": "全麦面包",
-        "Progress": true
-      },
-      {
-        "Content": "咖啡胶囊",
-        "Progress": true
-      },
-      {
-        "Content": "鸡蛋一打",
-        "Progress": true
-      },
-      {
-        "Content": "矿泉水1桶",
-        "Progress": false
-      }
-    ]
-  },
-  {
-    "id": "c89ef854-a149-4309-94d2-ea8f4b2a5afb",
-    "Type": "List",
-    "Title": "今日待办",
-    "Content": "把今天必须做完的事情清掉",
-    "createDate": "2025-11-18T08:00:00",
-    "Priority": 3,
-    "Tasks": [
-      {
-        "Content": "写完 CyberNote 单元测试",
-        "Progress": true
-      },
-      {
-        "Content": "给 ListNote 加 JSON 导入导出",
-        "Progress": false
-      },
-      {
-        "Content": "测试一下编辑保存功能",
-        "Progress": true
-      },
-      {
-        "Content": "写完新增任务功能",
-        "Progress": false
-      },
-      {
-        "Content": "修复新增任务功能的bug",
-        "Progress": true
-      }
-    ]
-  },
-  {
-    "id": "9bae89bc-ff26-4373-970e-eb2349979619",
+    "id": "f6d4ba4c-1db8-444b-a2f9-9cd6cda3ebc4",
     "Type": "Common",
-    "Title": "测试11111122222",
-    "Schedule": "2025-11-20T18:00:00",
-    "createDate": "2025-11-17T10:30:00",
+    "Title": "111111111111",
+    "Schedule": "2025-12-13T23:05:23.6841854+08:00",
+    "createDate": "2025-12-13T23:05:23.6844141+08:00",
     "Progress": false,
-    "Priority": 3,
-    "Content": "测试1用编辑编辑\r\n编辑11111\r\n1\r\n1\r\n1\r\n1\r\n1\r\n1\r\n1\r\n1\r\n1\r\n"
+    "Priority": 0,
+    "Content": "新建新建"
   }
 ]

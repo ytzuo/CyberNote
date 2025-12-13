@@ -7,6 +7,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Drawing;
+using System;
 
 namespace CyberNote
 {
@@ -26,7 +27,7 @@ namespace CyberNote
             _notifyIcon = new NotifyIcon();
             try
             {
-                _notifyIcon.Icon = new Icon("../../../Source/Icon/favicon.ico"); // 尝试加载自定义.ico图标
+                _notifyIcon.Icon = new Icon(Path.Combine(AppContext.BaseDirectory, "favicon.ico")); // 尝试加载自定义.ico图标
             }
             catch
             {
@@ -274,7 +275,7 @@ namespace CyberNote
             try
             {
                 var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-                var appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                var appPath = AppContext.BaseDirectory + "CyberNote.exe";
                 key?.SetValue("CyberNote", $"\"{appPath}\"");
             }
             catch { }

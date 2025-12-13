@@ -28,15 +28,18 @@ namespace CyberNote.Services
                         if (!string.IsNullOrWhiteSpace(path))
                         {
                             _dataFilePathCache = path;
+                            // 确保数据文件存在，如果不存在则创建空JSON数组
+                            if (!File.Exists(_dataFilePathCache))
+                            {
+                                try { File.WriteAllText(_dataFilePathCache, "[]"); } catch { }
+                            }
                             return path;
                         }
                     }
                 }
                 catch { }
-                // 默认路径（相对于项目根目录的 Data\data.json）
-                var assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                var projectRoot = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(assemblyLocation)));
-                var defaultPath = Path.Combine(projectRoot ?? AppContext.BaseDirectory, "Data", "data.json");
+                // 默认路径（与config_path.txt同目录）
+                var defaultPath = Path.Combine(AppDataDir, "data.json");
 
                 // 缓存并在 AppData 中持久化默认路径，保证首次运行后也能找到配置
                 _dataFilePathCache = defaultPath;
@@ -46,6 +49,12 @@ namespace CyberNote.Services
                     File.WriteAllText(ConfigFilePath, defaultPath);
                 }
                 catch { /* 忽略持久化异常 */ }
+
+                // 确保数据文件存在，如果不存在则创建空JSON数组
+                if (!File.Exists(_dataFilePathCache))
+                {
+                    try { File.WriteAllText(_dataFilePathCache, "[]"); } catch { }
+                }
 
                 return defaultPath;
             }
