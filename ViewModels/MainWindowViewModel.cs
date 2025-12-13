@@ -82,9 +82,23 @@ namespace CyberNote.ViewModels
                 Title = note.Title,
             };
             newCard.BuildContentPreview();
-            ThumbnailCards.Add(newCard);
+            
+            // 直接添加到开头（对于降序排序，最新的应该在最前面）
+            ThumbnailCards.Insert(0, newCard);
             JsonWriter.AppendNote(DataFilePath, note);
-            Debug.WriteLine($"AddNewCard clicked: Title={newCard.Title}, Type={newCard.Type}");
+            
+            // 手动更新 FilteredThumbnailCards
+            if (FilterType == "All" || FilterType == note.Type)
+            {
+                if (string.IsNullOrWhiteSpace(SearchText) || 
+                    newCard.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    newCard.ContentPreview.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                {
+                    FilteredThumbnailCards.Insert(0, newCard);
+                }
+            }
+            
+            Debug.WriteLine($"AddNewCard: Title={newCard.Title}, ThumbnailCards.Count={ThumbnailCards.Count}, FilteredCards.Count={FilteredThumbnailCards.Count}");
         }
 
 
@@ -122,6 +136,7 @@ namespace CyberNote.ViewModels
             bool wasActive = vm.IsActive;
             ThumbnailCards.Remove(vm);
             JsonWriter.DeleteNote(DataFilePath, noteId);
+            ApplyFilters(); // 更新筛选后的列表
             // 如果删除的是当前激活的卡片，尝试激活列表中的第一张卡片
             if (wasActive && ThumbnailCards.Count > 0)
             {

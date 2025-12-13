@@ -5,8 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:views="clr-namespace:CyberNote.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="240" d:DesignWidth="320">
+             d:DesignHeight="240" d:DesignWidth="320"
+             x:Name="Root">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <Style x:Key="FlatButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -38,12 +40,40 @@
             </Grid.RowDefinitions>
 
             <!-- 顶部：标题 -->
+            <!-- 查看模式 -->
             <TextBlock Grid.Row="0"
                        Text="{Binding Title}"
                        FontSize="18"
                        FontWeight="SemiBold"
                        Foreground="#2C3E50"
-                       TextTrimming="CharacterEllipsis"/>
+                       TextTrimming="CharacterEllipsis"
+                       MouseLeftButtonDown="TitleTextBlock_MouseLeftButtonDown"
+                       Cursor="Hand">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsTitleEditMode, ElementName=Root}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            
+            <!-- 编辑模式 -->
+            <TextBox Grid.Row="0"
+                     Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                     FontSize="18"
+                     FontWeight="SemiBold"
+                     Foreground="#2C3E50"
+                     BorderBrush="#4CAF50"
+                     BorderThickness="0,0,0,2"
+                     Background="Transparent"
+                     LostFocus="TitleTextBox_LostFocus"
+                     KeyDown="TitleTextBox_KeyDown"
+                     Visibility="{Binding IsTitleEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"
+                     x:Name="TitleTextBox"/>
 
             <!-- 中间：任务列表（可滚动） -->
             <views:TaskListView Grid.Row="1"
