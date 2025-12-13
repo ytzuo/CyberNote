@@ -77,6 +77,16 @@ namespace CyberNote.Views
             // DataContext 是 ListNote（在 ListCardView 的构造函数中设置）
             if (DataContext is ListNote list)
             {
+                // 更新 Content 为第一个任务项的文本
+                if (list.Tasks.Count > 0)
+                {
+                    list.Content = list.Tasks[0].Content;
+                }
+                else
+                {
+                    list.Content = "无任务";
+                }
+                
                 // 从窗口的 DataContext 取保存路径
                 if (Window.GetWindow(this)?.DataContext is CyberNote.ViewModels.MainWindowViewModel vm)
                 {
