@@ -135,7 +135,7 @@ namespace CyberNote
         /// <summary>
         /// 当用户选择某个卡片类型时触发
         /// </summary>
-        private void CardTypeButton_Click(object sender, RoutedEventArgs e)
+        private async void CardTypeButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not FrameworkElement element || element.Tag is not string cardType)
                 return;
@@ -147,10 +147,10 @@ namespace CyberNote
             switch (cardType)
             {
                 case "Common":
-                    CreateCommonNote(vm);
+                    await CreateCommonNote(vm);
                     break;
                 case "List":
-                    CreateListNote(vm);
+                    await CreateListNote(vm);
                     break;
                 // 可以继续添加其他类型
             }
@@ -198,7 +198,7 @@ namespace CyberNote
             }
         }
 
-        private void CreateCommonNote(MainWindowViewModel vm)
+        private async Task CreateCommonNote(MainWindowViewModel vm)
         {
             var content = "点击编辑内容...\n第二行示例";
             var note = new Models.CommonNote("新随手记", DateTime.Now, 0, content) 
@@ -213,13 +213,7 @@ namespace CyberNote
             
             // 插入到正确位置（降序时在开头）
             vm.ThumbnailCards.Insert(0, newCard);
-            JsonWriter.AppendNote(vm.DataFilePath, note);
-            
-            // 手动更新 FilteredThumbnailCards
-            if (vm.FilterType == "All" || vm.FilterType == note.Type)
-            {
-                vm.FilteredThumbnailCards.Insert(0, newCard);
-            }
+            await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
             
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
@@ -227,7 +221,7 @@ namespace CyberNote
 
         }
 
-        private void CreateListNote(MainWindowViewModel vm)
+        private async Task CreateListNote(MainWindowViewModel vm)
         {
             var note = new Models.ListNote("新任务列表", 0, "双击添加任务", new List<Models.TaskItem>()) 
             { 
@@ -243,13 +237,7 @@ namespace CyberNote
             
             // 插入到正确位置（降序时在开头）
             vm.ThumbnailCards.Insert(0, newCard);
-            JsonWriter.AppendNote(vm.DataFilePath, note);
-            
-            // 手动更新 FilteredThumbnailCards
-            if (vm.FilterType == "All" || vm.FilterType == note.Type)
-            {
-                vm.FilteredThumbnailCards.Insert(0, newCard);
-            }
+            await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
             
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))

@@ -149,7 +149,7 @@
 
                     <!-- 卡片列表 -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" MaxHeight="280" CanContentScroll="False">
-                        <ItemsControl ItemsSource="{Binding FilteredThumbnailCards}">
+                        <ItemsControl ItemsSource="{Binding ThumbnailCardsView}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <!-- 每行两个缩略卡片 -->

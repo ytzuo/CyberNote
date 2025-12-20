@@ -45,34 +45,38 @@ namespace CyberNote.Views
             public EditCommand(TaskListView owner) { _owner = owner; }
             public event EventHandler? CanExecuteChanged { add { } remove { } }
             public bool CanExecute(object? parameter) => parameter is TaskItem;
-            public void Execute(object? parameter)
+
+            // ICommand.Execute 是 void 返回类型，这里使用 async void 是允许的
+            public async void Execute(object? parameter)
             {
                 if (parameter is not TaskItem task) return;
                 task.IsEditing = !task.IsEditing;
                 if (!task.IsEditing)
                 {
-                    _owner.SaveCurrentListNote();
+                    await _owner.SaveCurrentListNote();
                 }
             }
         }
 
         // 失去焦点时退出编辑模式并保存
-        private void TaskEdit_LostFocus(object sender, RoutedEventArgs e)
+        // 事件处理程序必须是 async void
+        private async void TaskEdit_LostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is System.Windows.Controls.TextBox tb && tb.DataContext is TaskItem task)
             {
                 task.IsEditing = false;
-                SaveCurrentListNote();
+                await SaveCurrentListNote();
             }
         }
 
         // 勾选变化时保存，确保进度状态持久化
-        private void TaskProgress_Changed(object sender, RoutedEventArgs e)
+        // 事件处理程序必须是 async void，不能返回 Task
+        private async void TaskProgress_Changed(object sender, RoutedEventArgs e)
         {
-            SaveCurrentListNote();
+            await SaveCurrentListNote();
         }
 
-        private void SaveCurrentListNote()
+        private async Task SaveCurrentListNote()
         {
             // DataContext 是 ListNote（在 ListCardView 的构造函数中设置）
             if (DataContext is ListNote list)
@@ -86,12 +90,12 @@ namespace CyberNote.Views
                 {
                     list.Content = "无任务";
                 }
-                
+
                 // 从窗口的 DataContext 取保存路径
                 if (Window.GetWindow(this)?.DataContext is CyberNote.ViewModels.MainWindowViewModel vm)
                 {
                     var path = vm.DataFilePath;
-                    JsonWriter.SaveNote(path, list);
+                    await JsonWriter.SaveNote(path, list);
                 }
             }
         }

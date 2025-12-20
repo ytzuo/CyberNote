@@ -10,24 +10,28 @@ namespace CyberNote.Services
 {
     public static class JsonWriter
     {
-        public static void AppendNote(string filePath, NoteCard note)
+        // 全局并发保护, 确保文件写入的线程安全
+        private static readonly SemaphoreSlim _fileLock = new SemaphoreSlim(1, 1);
+        public static async Task AppendNoteAsync(string filePath, NoteCard note)
         {
-            if (note == null) throw new ArgumentNullException(nameof(note));
-
-            JsonArray rootArray = LoadExistingArray(filePath);
-
-            string newId = note.Id;
-            bool exists = rootArray.Any(n => n is JsonObject o &&
-                                             ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == newId) ||
-                                              (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == newId)));
-            if (exists) return; // 已存在同 ID
-
-            rootArray.Add(note.toJson());
-            WriteArray(filePath, rootArray);
+            await _fileLock.WaitAsync();
+            try
+            {
+                var arr = LoadExistingArray(filePath); // 可以改成异步读实现，但同步读也可以（在锁内）
+                                                       // 检查重复 ID...
+                arr.Add(note.toJson());
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                await WriteArrayAtomicAsync(filePath, arr, options);
+            }
+            finally { _fileLock.Release(); }
         }
 
         //实现保存修改（替换或追加）
-        public static void SaveNote(string filePath, NoteCard note)
+        public static async Task SaveNote(string filePath, NoteCard note)
         {
             if (note == null) throw new ArgumentNullException(nameof(note));
 
@@ -48,14 +52,14 @@ namespace CyberNote.Services
             }
 
             // 写回已移除旧项的数组
-            WriteArray(filePath, arr);
+            await WriteArrayAsync(filePath, arr);
 
             // AppendNote 追加新项（AppendNote 内会再次读取并追加）
-            AppendNote(filePath, note);
+            await AppendNoteAsync(filePath, note);
         }
 
         // 删除指定的记录
-        public static void DeleteNote(string filePath, string noteId)
+        public static async Task DeleteNote(string filePath, string noteId)
         {
             if (string.IsNullOrWhiteSpace(noteId)) throw new ArgumentNullException(nameof(noteId));
             var arr = LoadExistingArray(filePath);
@@ -72,7 +76,7 @@ namespace CyberNote.Services
             }
             if (removed)
             {
-                WriteArray(filePath, arr);
+                await WriteArrayAsync(filePath, arr);
             }
         }
 
@@ -89,14 +93,62 @@ namespace CyberNote.Services
             catch { return new JsonArray(); }
         }
 
-        private static void WriteArray(string filePath, JsonArray arr)
+        private static async Task WriteArrayAsync(string filePath, JsonArray arr)
         {
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
-            File.WriteAllText(filePath, arr.ToJsonString(options));
+            var text = arr.ToJsonString(options);
+            var dir = Path.GetDirectoryName(filePath) ?? ".";
+            Directory.CreateDirectory(dir);
+            await File.WriteAllTextAsync(filePath, text);
+        }
+
+        public static async Task WriteArrayAtomicAsync(string filePath, JsonArray arr, JsonSerializerOptions options)
+        {
+            var dir = Path.GetDirectoryName(filePath) ?? ".";
+            Directory.CreateDirectory(dir);
+
+            // 临时文件（同一目录）
+            var tempPath = Path.Combine(dir, Path.GetFileName(filePath) + ".tmp." + Guid.NewGuid().ToString("N"));
+            var backupPath = Path.Combine(dir, Path.GetFileName(filePath) + ".bak");
+
+            await _fileLock.WaitAsync();
+            try
+            {
+                // 使用异步 FileStream 写入（useAsync: true）并序列化到流
+                using (var fs = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, useAsync: true))
+                {
+                    await JsonSerializer.SerializeAsync(fs, arr, options);
+                    await fs.FlushAsync(); // 把内容刷新到操作系统缓存
+                }
+
+                // 原子替换：File.Replace 会用临时文件替换目标并可创建备份（Windows）
+                if (File.Exists(filePath))
+                {
+                    // backupPath 可为 null；若不想保留备份可改用 File.Move(tempPath, filePath, true)（.NET 6+）
+                    File.Replace(tempPath, filePath, backupPath, ignoreMetadataErrors: true);
+                    // 删除备份（可选）
+                    if (File.Exists(backupPath)) File.Delete(backupPath);
+                }
+                else
+                {
+                    // 目标不存在，直接移动临时文件为目标（在同一分区是原子操作）
+                    File.Move(tempPath, filePath);
+                }
+            }
+            catch
+            {
+                // 失败时尝试清理临时文件
+                try { if (File.Exists(tempPath)) File.Delete(tempPath); } catch { }
+                throw;
+            }
+            finally
+            {
+                _fileLock.Release();
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -20,7 +21,7 @@ namespace CyberNote.ViewModels
     internal class MainWindowViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<ThumbnailCardViewModel> ThumbnailCards { get; } = new ObservableCollection<ThumbnailCardViewModel>();
-        public ObservableCollection<ThumbnailCardViewModel> FilteredThumbnailCards { get; } = new ObservableCollection<ThumbnailCardViewModel>();
+        public ICollectionView ThumbnailCardsView { get; private set; }
 
         private string _searchText = string.Empty;
         public string SearchText
@@ -70,9 +71,9 @@ namespace CyberNote.ViewModels
             }
         }
 
-        private void ExecuteAddNewCard()
+        private async Task ExecuteAddNewCard()
         {
-            var content = "点击编辑内容...\n第二行示例";
+            var content = "点击编辑内容...\n正文示例";
             var note = new CommonNote("新笔记标题", DateTime.Now, 0, content) 
                         { createDate = DateTime.Now };
             var newCard = new ThumbnailCardViewModel(note)
@@ -85,7 +86,7 @@ namespace CyberNote.ViewModels
             
             // 直接添加到开头（对于降序排序，最新的应该在最前面）
             ThumbnailCards.Insert(0, newCard);
-            JsonWriter.AppendNote(DataFilePath, note);
+            await JsonWriter.AppendNoteAsync(DataFilePath, note);
             
             // 手动更新 FilteredThumbnailCards
             if (FilterType == "All" || FilterType == note.Type)
@@ -94,11 +95,11 @@ namespace CyberNote.ViewModels
                     newCard.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                     newCard.ContentPreview.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
                 {
-                    FilteredThumbnailCards.Insert(0, newCard);
+                    ThumbnailCards.Insert(0, newCard);
                 }
             }
             
-            Debug.WriteLine($"AddNewCard: Title={newCard.Title}, ThumbnailCards.Count={ThumbnailCards.Count}, FilteredCards.Count={FilteredThumbnailCards.Count}");
+            Debug.WriteLine($"AddNewCard: Title={newCard.Title}, ThumbnailCards.Count={ThumbnailCards.Count}, FilteredCards.Count={ThumbnailCards.Count}");
         }
 
 
@@ -127,7 +128,7 @@ namespace CyberNote.ViewModels
             SetActiveCard(vm);
         }
 
-        private void ExecuteDeleteCard(ThumbnailCardViewModel vm)
+        private async Task ExecuteDeleteCard(ThumbnailCardViewModel vm)
         {
             if (vm == null) return;
             NoteCard note = vm.Note!;
@@ -135,7 +136,7 @@ namespace CyberNote.ViewModels
             String noteId = note.Id;
             bool wasActive = vm.IsActive;
             ThumbnailCards.Remove(vm);
-            JsonWriter.DeleteNote(DataFilePath, noteId);
+            await JsonWriter.DeleteNote(DataFilePath, noteId);
             ApplyFilters(); // 更新筛选后的列表
             // 如果删除的是当前激活的卡片，尝试激活列表中的第一张卡片
             if (wasActive && ThumbnailCards.Count > 0)
@@ -144,7 +145,7 @@ namespace CyberNote.ViewModels
             }
             else if (ThumbnailCards.Count == 0)
             {
-                ExecuteAddNewCard();
+                await ExecuteAddNewCard();
                 ExecuteReplaceMainCard(ThumbnailCards.First());
             }
         }
@@ -157,20 +158,28 @@ namespace CyberNote.ViewModels
 
         public MainWindowViewModel()
         {
-            AddNewCardCommand = new RelayCommand(ExecuteAddNewCard);
+            AddNewCardCommand = new RelayCommand(async () => await ExecuteAddNewCard());
             ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ExecuteReplaceMainCard);
-            DeleteCard = new RelayCommand<ThumbnailCardViewModel>(ExecuteDeleteCard);
+            DeleteCard = new RelayCommand<ThumbnailCardViewModel>(async (vm) => await ExecuteDeleteCard(vm));
 
-            LoadCard();
+            ThumbnailCardsView = CollectionViewSource.GetDefaultView(ThumbnailCards);
+            ThumbnailCardsView.Filter = FilterPredicate;
+            SetSortDescriptions(); // 自定义方法设置 SortDescriptions 根据 CurrentSort 进行排序
+
+            // 构造函数不能是异步的，所以这里不能 await LoadCard()
+            // 我们可以启动一个不等待的任务，或者将 LoadCard 改回同步，或者在 Loaded 事件中调用
+            // 这里选择启动一个不等待的任务，并处理可能的异常
+            _ = LoadCardAsync();
         }
 
-        private void LoadCard()
+        private async Task LoadCardAsync()
         {
             var path = DataFilePath;
             if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
             
             //加载所有卡片存储的list
-            var cards = JsonReader.LoadAllCard(path);
+            // JsonReader.LoadAllCard 目前是同步的，如果需要也可以改为异步
+            var cards = await Task.Run(() => JsonReader.LoadAllCard(path));
             cards = SortNoteCards(cards);
 
             var idSet = new HashSet<string>();
@@ -189,7 +198,7 @@ namespace CyberNote.ViewModels
 
             if (ThumbnailCards.Count == 0)
             {
-                ExecuteAddNewCard();
+                await ExecuteAddNewCard();
             }
             ExecuteReplaceMainCard(ThumbnailCards.First());
             // 初始化筛选后的列表
@@ -241,7 +250,7 @@ namespace CyberNote.ViewModels
         public void ReloadData()
         {
             ThumbnailCards.Clear();
-            LoadCard();
+            _ = LoadCardAsync();
         }
 
         /// <summary>
@@ -259,11 +268,35 @@ namespace CyberNote.ViewModels
             }
             // 应用筛选和排序
             ApplyFilters();
-            // 如果需要，更新当前激活卡片
-            if (FilteredThumbnailCards.Any())
+        }
+
+        private bool FilterPredicate(object obj)
+        {
+            if (obj is not ThumbnailCardViewModel vm) return false;
+
+            // 类型筛选
+            if (FilterType != "All" && vm.Type != FilterType) return false;
+
+            // 搜索筛选
+            if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                ExecuteReplaceMainCard(FilteredThumbnailCards.First());
+                var s = SearchText;
+                return vm.Title.Contains(s, StringComparison.OrdinalIgnoreCase) ||
+                       vm.ContentPreview.Contains(s, StringComparison.OrdinalIgnoreCase);
             }
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SetSortDescriptions()
+        {
+            ThumbnailCardsView.SortDescriptions.Clear();
+            if (CurrentSort == SortOption.ByDateDesc)
+                ThumbnailCardsView.SortDescriptions.Add(new SortDescription(nameof(ThumbnailCardViewModel.CreateDate), ListSortDirection.Descending));
+            else
+                ThumbnailCardsView.SortDescriptions.Add(new SortDescription(nameof(ThumbnailCardViewModel.CreateDate), ListSortDirection.Ascending));
         }
 
         /// <summary>
@@ -271,34 +304,11 @@ namespace CyberNote.ViewModels
         /// </summary>
         private void ApplyFilters()
         {
-            var filtered = ThumbnailCards.AsEnumerable();
+            // 如果排序策略可能改变，先更新 SortDescriptions
+            SetSortDescriptions();
 
-            // 搜索筛选
-            if (!string.IsNullOrWhiteSpace(SearchText))
-            {
-                filtered = filtered.Where(vm => vm.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                                vm.ContentPreview.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
-            }
-
-            // 类型筛选
-            if (FilterType != "All")
-            {
-                filtered = filtered.Where(vm => vm.Type == FilterType);
-            }
-
-            // 排序
-            filtered = CurrentSort switch
-            {
-                SortOption.ByDateAsc => filtered.OrderBy(vm => vm.CreateDate),
-                SortOption.ByDateDesc => filtered.OrderByDescending(vm => vm.CreateDate),
-                _ => filtered
-            };
-
-            FilteredThumbnailCards.Clear();
-            foreach (var vm in filtered)
-            {
-                FilteredThumbnailCards.Add(vm);
-            }
+            // 然后刷新 Filter
+            ThumbnailCardsView.Refresh();
         }
     }
 }
