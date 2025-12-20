@@ -1,5 +1,15 @@
 [
   {
+    "id": "1f39a595-7084-4b68-adf8-0e44c5532b21",
+    "Type": "Common",
+    "Title": "现在开始重构部分设计",
+    "Schedule": "2025-12-20T16:19:45.6998532+08:00",
+    "createDate": "2025-12-20T16:19:45.7000398+08:00",
+    "Progress": false,
+    "Priority": 0,
+    "Content": "现在开始优化这个小玩具, 继续作为学习C#的项目\r\n\r\n开始维护新功能, 优化原有设计"
+  },
+  {
     "id": "8dd6a412-edb5-40f9-a4c3-a51e65cbf4ff",
     "Type": "List",
     "Title": "13还是14周待办",
@@ -18,17 +28,11 @@
       {
         "Content": "学习vue",
         "Progress": false
+      },
+      {
+        "Content": "修复CyberNote的bug",
+        "Progress": true
       }
     ]
-  },
-  {
-    "id": "1f39a595-7084-4b68-adf8-0e44c5532b21",
-    "Type": "Common",
-    "Title": "现在开始重构部分设计",
-    "Schedule": "2025-12-20T16:19:45.6998532+08:00",
-    "createDate": "2025-12-20T16:19:45.7000398+08:00",
-    "Progress": false,
-    "Priority": 0,
-    "Content": "现在开始优化这个小玩具, 继续作为学习C#的项目\r\n\r\n开始维护新功能, 优化原有设计"
   }
 ]

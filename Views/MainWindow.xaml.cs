@@ -18,8 +18,7 @@ namespace CyberNote
     {
         private NotifyIcon _notifyIcon;
         private bool _isExit;
-        private ToolStripMenuItem _showHideMenuItem;
-        //private MainWindowViewModel vm;
+        private ToolStripMenuItem _showHideMenuItem;       
         public MainWindow()
         {
             InitializeComponent();
@@ -326,6 +325,11 @@ namespace CyberNote
         {
             if (IsVisible)
             {
+                // 隐藏窗口时，关闭所有 popup
+                TypeSelectorPopup.IsOpen = false;
+                OptionPopup.IsOpen = false;
+                WidePopup.IsOpen = false;
+                
                 Hide();
                 _showHideMenuItem.Text = "显示";
             }
@@ -335,6 +339,7 @@ namespace CyberNote
                 WindowState = WindowState.Normal;
                 Activate();
                 _showHideMenuItem.Text = "隐藏";
+                // 不打开 popup
             }
         }
     }
