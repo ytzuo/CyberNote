@@ -52,7 +52,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/master'
         with:
-          tag_name: v${{ github.run_number }}   # 简单用 CI 编号当版本
+          tag_name: v1 #固定为v1版本
           name: Release ${{ github.run_number }}
           files: |
             ${{ matrix.rid }}.zip
