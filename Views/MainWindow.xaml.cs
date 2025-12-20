@@ -18,12 +18,14 @@ namespace CyberNote
     {
         private NotifyIcon _notifyIcon;
         private bool _isExit;
-        private ToolStripMenuItem _showHideMenuItem;       
+        private ToolStripMenuItem _showHideMenuItem;
+        private Views.FloatingBlock _floatingBlock;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
+            _floatingBlock = new Views.FloatingBlock();
             try
             {
                 // 优先尝试部署目录下的 favicon.ico
@@ -305,6 +307,8 @@ namespace CyberNote
             else
             {
                 _notifyIcon.Dispose();
+                // 退出时关闭悬浮块
+                _floatingBlock.Close();
                 // 退出前确保所有数据已保存（可选，如果所有操作都是即时保存的，这里可能不需要）
                 // 但为了保险起见，可以在这里添加保存逻辑，或者等待挂起的任务
             }
@@ -332,6 +336,9 @@ namespace CyberNote
                 
                 Hide();
                 _showHideMenuItem.Text = "显示";
+                
+                // 显示悬浮块
+                _floatingBlock.Show();
             }
             else
             {
@@ -340,7 +347,16 @@ namespace CyberNote
                 Activate();
                 _showHideMenuItem.Text = "隐藏";
                 // 不打开 popup
+                
+                // 隐藏悬浮块
+                _floatingBlock.Hide();
             }
+        }
+
+        public void ExitApplication()
+        {
+            _isExit = true;
+            Close();
         }
     }
 }
