@@ -24,14 +24,47 @@ namespace CyberNote
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
-            _notifyIcon = new NotifyIcon();
+            _notifyIcon = new System.Windows.Forms.NotifyIcon();
             try
             {
-                _notifyIcon.Icon = new Icon(Path.Combine(AppContext.BaseDirectory, "favicon.ico")); // 尝试加载自定义.ico图标
+                // 优先尝试部署目录下的 favicon.ico
+                var icoPath = Path.Combine(AppContext.BaseDirectory, "favicon.ico");
+                if (File.Exists(icoPath))
+                {
+                    _notifyIcon.Icon = new System.Drawing.Icon(icoPath);
+                }
+                else
+                {
+                    // 如果没有独立的 ico，尝试从可执行文件中提取嵌入图标
+                    var exePath = Path.Combine(AppContext.BaseDirectory, "CyberNote.exe");
+                    if (File.Exists(exePath))
+                    {
+                        try
+                        {
+                            var extracted = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+                            if (extracted != null)
+                            {
+                                _notifyIcon.Icon = extracted;
+                            }
+                            else
+                            {
+                                _notifyIcon.Icon = System.Drawing.SystemIcons.Application;
+                            }
+                        }
+                        catch
+                        {
+                            _notifyIcon.Icon = System.Drawing.SystemIcons.Application;
+                        }
+                    }
+                    else
+                    {
+                        _notifyIcon.Icon = System.Drawing.SystemIcons.Application; // 兜底
+                    }
+                }
             }
             catch
             {
-                _notifyIcon.Icon = SystemIcons.Application; // 如果失败，使用默认图标
+                _notifyIcon.Icon = System.Drawing.SystemIcons.Application; // 如果失败，使用默认图标
             }
             _notifyIcon.Text = "CyberNote";
             _notifyIcon.Visible = true;
