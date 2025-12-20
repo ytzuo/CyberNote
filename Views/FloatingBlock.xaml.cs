@@ -42,59 +42,66 @@ namespace CyberNote.Views
                 var pngPath = System.IO.Path.Combine(AppContext.BaseDirectory, "favicon.png");
                 if (File.Exists(pngPath))
                 {
-                    faviconImage.Source = new BitmapImage(new Uri(pngPath));
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(pngPath, UriKind.Absolute);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze(); // 冻结以提高性能和线程安全
+                    faviconImage.Source = bitmap;
+                    return;
                 }
-                else
+                
+                // 如果没有 PNG，尝试 ICO
+                var icoPath = System.IO.Path.Combine(AppContext.BaseDirectory, "favicon.ico");
+                if (File.Exists(icoPath))
                 {
-                    // 如果没有 PNG，尝试 ICO
-                    var icoPath = System.IO.Path.Combine(AppContext.BaseDirectory, "favicon.ico");
-                    if (File.Exists(icoPath))
+                    // 使用 IconBitmapDecoder 来正确处理 ICO 文件的透明度
+                    var decoder = new IconBitmapDecoder(new Uri(icoPath), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    if (decoder.Frames.Count > 0)
                     {
-                        // 使用 IconBitmapDecoder 来正确处理 ICO 文件的透明度
-                        var decoder = new IconBitmapDecoder(new Uri(icoPath), BitmapCreateOptions.None, BitmapCacheOption.Default);
-                        if (decoder.Frames.Count > 0)
+                        var frame = decoder.Frames[0];
+                        if (frame.Format.BitsPerPixel == 32) // 确保支持透明度
                         {
-                            faviconImage.Source = decoder.Frames[0]; // 使用第一个帧
+                            faviconImage.Source = frame;
+                            return;
                         }
                     }
-                    else
+                }
+                
+                // 如果没有独立的 ico，尝试从可执行文件中提取嵌入图标
+                var exePath = System.IO.Path.Combine(AppContext.BaseDirectory, "CyberNote.exe");
+                if (File.Exists(exePath))
+                {
+                    try
                     {
-                        // 如果没有独立的 ico，尝试从可执行文件中提取嵌入图标
-                        var exePath = System.IO.Path.Combine(AppContext.BaseDirectory, "CyberNote.exe");
-                        if (File.Exists(exePath))
+                        var extracted = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+                        if (extracted != null)
                         {
-                            try
+                            // 使用更好的转换方法
+                            using (var bitmap = extracted.ToBitmap())
                             {
-                                var extracted = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
-                                if (extracted != null)
+                                var hBitmap = bitmap.GetHbitmap();
+                                try
                                 {
-                                    // 将 System.Drawing.Icon 转换为 BitmapImage
-                                    using (var ms = new System.IO.MemoryStream())
-                                    {
-                                        extracted.Save(ms);
-                                        ms.Seek(0, System.IO.SeekOrigin.Begin);
-                                        var bitmap = new BitmapImage();
-                                        bitmap.BeginInit();
-                                        bitmap.StreamSource = ms;
-                                        bitmap.EndInit();
-                                        faviconImage.Source = bitmap;
-                                    }
+                                    var imageSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                                        hBitmap,
+                                        IntPtr.Zero,
+                                        System.Windows.Int32Rect.Empty,
+                                        BitmapSizeOptions.FromEmptyOptions());
+                                    imageSource.Freeze();
+                                    faviconImage.Source = imageSource;
                                 }
-                                else
+                                finally
                                 {
-                                    // 兜底使用默认图标（这里可以设置一个默认的 BitmapImage）
-                                    faviconImage.Source = null; // 或设置默认
+                                    DeleteObject(hBitmap);
                                 }
                             }
-                            catch
-                            {
-                                faviconImage.Source = null;
-                            }
                         }
-                        else
-                        {
-                            faviconImage.Source = null;
-                        }
+                    }
+                    catch
+                    {
+                        faviconImage.Source = null;
                     }
                 }
             }
@@ -103,6 +110,9 @@ namespace CyberNote.Views
                 faviconImage.Source = null;
             }
         }
+        
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        private static extern bool DeleteObject(IntPtr hObject);
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

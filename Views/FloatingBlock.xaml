@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="FloatingBlock" Height="50" Width="50"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseRightButtonDown="Window_MouseRightButtonDown">
     <Grid>
