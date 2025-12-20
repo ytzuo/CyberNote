@@ -5,6 +5,9 @@ on:
     branches: [ master ]          # 也可加 pull_request:
   workflow_dispatch:            # 手动触发按钮
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
