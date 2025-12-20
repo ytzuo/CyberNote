@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include=".github\workflows\build-release.yml" />
     <None Include="Source/Icon/favicon.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

@@ -88,18 +88,7 @@ namespace CyberNote.ViewModels
             ThumbnailCards.Insert(0, newCard);
             await JsonWriter.AppendNoteAsync(DataFilePath, note);
             
-            // 手动更新 FilteredThumbnailCards
-            if (FilterType == "All" || FilterType == note.Type)
-            {
-                if (string.IsNullOrWhiteSpace(SearchText) || 
-                    newCard.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    newCard.ContentPreview.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-                {
-                    ThumbnailCards.Insert(0, newCard);
-                }
-            }
-            
-            Debug.WriteLine($"AddNewCard: Title={newCard.Title}, ThumbnailCards.Count={ThumbnailCards.Count}, FilteredCards.Count={ThumbnailCards.Count}");
+            Debug.WriteLine($"AddNewCard: Title={newCard.Title}, ThumbnailCards.Count={ThumbnailCards.Count}");
         }
 
 

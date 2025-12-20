@@ -1,0 +1,58 @@
+name: Build & Release 单文件可执行包
+
+on:
+  push:
+    branches: [ main ]          # 也可加 pull_request:
+  workflow_dispatch:            # 手动触发按钮
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rid: [ win-x64 ]   # 需要更多 RID 继续加
+    runs-on: windows-latest
+    steps:
+      # 1. 拉代码
+      - uses: actions/checkout@v4
+
+      # 2. 装 .NET 8 SDK（支持 --self-contained 单文件发布）
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # 3. 还原 & 编译
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      # 4. 单文件发布（自带运行时，不需要客户机装 .NET）
+      - name: Publish single-file
+        run: |
+          dotnet publish CyberNote.csproj \   # ← 改成你的启动项目路径
+            -c Release \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -r ${{ matrix.rid }} \
+            -o pub/${{ matrix.rid }}
+
+      # 5. 打成 zip（Windows 用 zip，其余用 tar）
+      - name: Package
+        run: |
+          Compress-Archive -Path pub\win-x64\* -DestinationPath win-x64.zip
+
+      # 6. 上传成品到 GitHub Release（自动创建标签）
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v${{ github.run_number }}   # 简单用 CI 编号当版本
+          name: Release ${{ github.run_number }}
+          files: |
+            ${{ matrix.rid }}.zip
+            ${{ matrix.rid }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
