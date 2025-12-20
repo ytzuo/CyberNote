@@ -294,7 +294,7 @@ namespace CyberNote
             }
         }
 
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
             // 如果不是主动退出（如通过菜单项点关闭），则隐藏窗口
@@ -306,6 +306,8 @@ namespace CyberNote
             else
             {
                 _notifyIcon.Dispose();
+                // 退出前确保所有数据已保存（可选，如果所有操作都是即时保存的，这里可能不需要）
+                // 但为了保险起见，可以在这里添加保存逻辑，或者等待挂起的任务
             }
         }
 

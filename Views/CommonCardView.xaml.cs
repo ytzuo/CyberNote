@@ -63,34 +63,39 @@ namespace CyberNote.Views
             }
         }
 
-        /// <summary>
-        /// 编辑框失去焦点时退出编辑模式
-        /// </summary>
+        // 失去焦点时退出编辑模式并保存
         private void EditElement_LostFocus(object sender, System.Windows.RoutedEventArgs e)
         {
             IsEditMode = false;
             // 保存到 JSON：DataContext 绑定到 CommonNote，Content 已被更新
-                if (DataContext is CommonNote note)
+            if (DataContext is CommonNote note)
             {
-                try
-                {                 
-                    var path = ConfigService.DataFilePath;
-                    var dir = Path.GetDirectoryName(path);
-                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                        Directory.CreateDirectory(dir);
+                // 使用 Task.Run 包装异步调用，避免 async void 带来的潜在问题，或者改为 async void
+                // 这里为了简单起见，使用 fire-and-forget，但建议捕获异常
+                _ = SaveNoteAsync(note);
+            }
+        }
 
-                    if (string.IsNullOrWhiteSpace(note.Id))
-                        note.Id = Guid.NewGuid().ToString();
+        private async Task SaveNoteAsync(CommonNote note)
+        {
+            try
+            {
+                var path = ConfigService.DataFilePath;
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
 
-                    // 使用 SaveNote，它会清除旧条目并复用 AppendNote 追加新条目
-                    JsonWriter.SaveNote(path, note);
+                if (string.IsNullOrWhiteSpace(note.Id))
+                    note.Id = Guid.NewGuid().ToString();
 
-                    Debug.WriteLine($"Note saved: Id={note.Id} Title={note.Title}");
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"保存笔记失败: {ex.Message}");
-                }
+                // 使用 SaveNote，它会清除旧条目并复用 AppendNote 追加新条目
+                await JsonWriter.SaveNote(path, note);
+
+                Debug.WriteLine($"Note saved: Id={note.Id} Title={note.Title}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"保存笔记失败: {ex.Message}");
             }
         }
 
@@ -108,25 +113,7 @@ namespace CyberNote.Views
                 // 保存到 JSON：DataContext 绑定到 CommonNote，Content 已被更新
                 if (DataContext is CommonNote note)
                 {
-                    try
-                    {
-                        var path = ConfigService.DataFilePath;
-                        var dir = Path.GetDirectoryName(path);
-                        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                            Directory.CreateDirectory(dir);
-
-                        if (string.IsNullOrWhiteSpace(note.Id))
-                            note.Id = Guid.NewGuid().ToString();
-
-                        // 使用 SaveNote，它会清除旧条目并复用 AppendNote 追加新条目
-                        JsonWriter.SaveNote(path, note);
-
-                        Debug.WriteLine($"Note saved: Id={note.Id} Title={note.Title}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"保存笔记失败: {ex.Message}");
-                    }
+                    _ = SaveNoteAsync(note);
                 }
            }
         }

@@ -35,49 +35,70 @@ namespace CyberNote.Services
         {
             if (note == null) throw new ArgumentNullException(nameof(note));
 
-            // 读取并移除所有同 Id 的现有项，再写回空缺的数组
-            var arr = LoadExistingArray(filePath);
-
-            if (!string.IsNullOrWhiteSpace(note.Id))
+            await _fileLock.WaitAsync();
+            try
             {
-                for (int i = arr.Count - 1; i >= 0; i--)
+                // 读取并移除所有同 Id 的现有项，再写回空缺的数组
+                var arr = LoadExistingArray(filePath);
+
+                if (!string.IsNullOrWhiteSpace(note.Id))
                 {
-                    if (arr[i] is JsonObject o &&
-                        ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == note.Id) ||
-                         (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == note.Id)))
+                    for (int i = arr.Count - 1; i >= 0; i--)
                     {
-                        arr.RemoveAt(i);
+                        if (arr[i] is JsonObject o &&
+                            ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == note.Id) ||
+                             (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == note.Id)))
+                        {
+                            arr.RemoveAt(i);
+                        }
                     }
                 }
+
+                // 追加新项
+                arr.Add(note.toJson());
+
+                // 原子写入
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                await WriteArrayAtomicAsync(filePath, arr, options);
             }
-
-            // 写回已移除旧项的数组
-            await WriteArrayAsync(filePath, arr);
-
-            // AppendNote 追加新项（AppendNote 内会再次读取并追加）
-            await AppendNoteAsync(filePath, note);
+            finally { _fileLock.Release(); }
         }
 
         // 删除指定的记录
         public static async Task DeleteNote(string filePath, string noteId)
         {
             if (string.IsNullOrWhiteSpace(noteId)) throw new ArgumentNullException(nameof(noteId));
-            var arr = LoadExistingArray(filePath);
-            bool removed = false;
-            for (int i = arr.Count - 1; i >= 0; i--)
+
+            await _fileLock.WaitAsync();
+            try
             {
-                if (arr[i] is JsonObject o &&
-                    ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == noteId) ||
-                     (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == noteId)))
+                var arr = LoadExistingArray(filePath);
+                bool removed = false;
+                for (int i = arr.Count - 1; i >= 0; i--)
                 {
-                    arr.RemoveAt(i);
-                    removed = true;
+                    if (arr[i] is JsonObject o &&
+                        ((o.TryGetPropertyValue("Id", out var idNode) && idNode?.GetValue<string>() == noteId) ||
+                         (o.TryGetPropertyValue("id", out var idNode2) && idNode2?.GetValue<string>() == noteId)))
+                    {
+                        arr.RemoveAt(i);
+                        removed = true;
+                    }
+                }
+                if (removed)
+                {
+                    var options = new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                    };
+                    await WriteArrayAtomicAsync(filePath, arr, options);
                 }
             }
-            if (removed)
-            {
-                await WriteArrayAsync(filePath, arr);
-            }
+            finally { _fileLock.Release(); }
         }
 
         private static JsonArray LoadExistingArray(string filePath)
@@ -115,7 +136,7 @@ namespace CyberNote.Services
             var tempPath = Path.Combine(dir, Path.GetFileName(filePath) + ".tmp." + Guid.NewGuid().ToString("N"));
             var backupPath = Path.Combine(dir, Path.GetFileName(filePath) + ".bak");
 
-            await _fileLock.WaitAsync();
+
             try
             {
                 // 使用异步 FileStream 写入（useAsync: true）并序列化到流
@@ -144,10 +165,6 @@ namespace CyberNote.Services
                 // 失败时尝试清理临时文件
                 try { if (File.Exists(tempPath)) File.Delete(tempPath); } catch { }
                 throw;
-            }
-            finally
-            {
-                _fileLock.Release();
             }
         }
     }

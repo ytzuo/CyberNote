@@ -1,4 +1,5 @@
 ﻿using CyberNote.Models;
+using CyberNote.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,7 @@ namespace CyberNote.Views
         private void TitleTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             IsTitleEditMode = false;
+            _ = SaveListNoteAsync();
         }
 
         private void TitleTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -67,11 +69,13 @@ namespace CyberNote.Views
             {
                 IsTitleEditMode = false;
                 e.Handled = true;
+                _ = SaveListNoteAsync();
             }
             else if (e.Key == Key.Escape)
             {
                 IsTitleEditMode = false;
                 e.Handled = true;
+                _ = SaveListNoteAsync();
             }
         }
 
@@ -83,6 +87,9 @@ namespace CyberNote.Views
                 var task = new TaskItem("新任务");
                 list.AddTask(task);
                 task.IsEditing = true; // 默认进入编辑模式，方便立即输入
+                
+                // 保存新增的任务
+                _ = SaveListNoteAsync();
 
                 // 等待UI更新后滚动到底部
                 Dispatcher.BeginInvoke(() =>
@@ -94,6 +101,23 @@ namespace CyberNote.Views
                         scrollViewer?.ScrollToEnd();
                     }
                 }, DispatcherPriority.Background);
+            }
+        }
+
+        private async Task SaveListNoteAsync()
+        {
+            if (DataContext is ListNote list)
+            {
+                try
+                {
+                    var path = ConfigService.DataFilePath;
+                    await JsonWriter.SaveNote(path, list);
+                }
+                catch (Exception ex)
+                {
+                    // 记录错误或提示用户
+                    System.Diagnostics.Debug.WriteLine($"保存任务列表失败: {ex.Message}");
+                }
             }
         }
 
