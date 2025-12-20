@@ -31,12 +31,12 @@ jobs:
       # 4. 单文件发布（自带运行时，不需要客户机装 .NET）
       - name: Publish single-file
         run: |
-          dotnet publish CyberNote.csproj \   # ← 改成你的启动项目路径
-            -c Release \
-            --self-contained true \
-            -p:PublishSingleFile=true \
-            -p:IncludeNativeLibrariesForSelfExtract=true \
-            -r ${{ matrix.rid }} \
+          dotnet publish CyberNote.csproj `
+            -c Release `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -r ${{ matrix.rid }} `
             -o pub/${{ matrix.rid }}
 
       # 5. 打成 zip（Windows 用 zip，其余用 tar）
