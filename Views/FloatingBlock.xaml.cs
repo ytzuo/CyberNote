@@ -38,49 +38,63 @@ namespace CyberNote.Views
 
             try
             {
-                // 优先尝试部署目录下的 favicon.ico
-                var icoPath = System.IO.Path.Combine(AppContext.BaseDirectory, "favicon.ico");
-                if (File.Exists(icoPath))
+                // 优先尝试部署目录下的 favicon.png
+                var pngPath = System.IO.Path.Combine(AppContext.BaseDirectory, "favicon.png");
+                if (File.Exists(pngPath))
                 {
-                    faviconImage.Source = new BitmapImage(new Uri(icoPath));
+                    faviconImage.Source = new BitmapImage(new Uri(pngPath));
                 }
                 else
                 {
-                    // 如果没有独立的 ico，尝试从可执行文件中提取嵌入图标
-                    var exePath = System.IO.Path.Combine(AppContext.BaseDirectory, "CyberNote.exe");
-                    if (File.Exists(exePath))
+                    // 如果没有 PNG，尝试 ICO
+                    var icoPath = System.IO.Path.Combine(AppContext.BaseDirectory, "favicon.ico");
+                    if (File.Exists(icoPath))
                     {
-                        try
+                        // 使用 IconBitmapDecoder 来正确处理 ICO 文件的透明度
+                        var decoder = new IconBitmapDecoder(new Uri(icoPath), BitmapCreateOptions.None, BitmapCacheOption.Default);
+                        if (decoder.Frames.Count > 0)
                         {
-                            var extracted = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
-                            if (extracted != null)
-                            {
-                                // 将 System.Drawing.Icon 转换为 BitmapImage
-                                using (var ms = new System.IO.MemoryStream())
-                                {
-                                    extracted.Save(ms);
-                                    ms.Seek(0, System.IO.SeekOrigin.Begin);
-                                    var bitmap = new BitmapImage();
-                                    bitmap.BeginInit();
-                                    bitmap.StreamSource = ms;
-                                    bitmap.EndInit();
-                                    faviconImage.Source = bitmap;
-                                }
-                            }
-                            else
-                            {
-                                // 兜底使用默认图标（这里可以设置一个默认的 BitmapImage）
-                                faviconImage.Source = null; // 或设置默认
-                            }
-                        }
-                        catch
-                        {
-                            faviconImage.Source = null;
+                            faviconImage.Source = decoder.Frames[0]; // 使用第一个帧
                         }
                     }
                     else
                     {
-                        faviconImage.Source = null;
+                        // 如果没有独立的 ico，尝试从可执行文件中提取嵌入图标
+                        var exePath = System.IO.Path.Combine(AppContext.BaseDirectory, "CyberNote.exe");
+                        if (File.Exists(exePath))
+                        {
+                            try
+                            {
+                                var extracted = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+                                if (extracted != null)
+                                {
+                                    // 将 System.Drawing.Icon 转换为 BitmapImage
+                                    using (var ms = new System.IO.MemoryStream())
+                                    {
+                                        extracted.Save(ms);
+                                        ms.Seek(0, System.IO.SeekOrigin.Begin);
+                                        var bitmap = new BitmapImage();
+                                        bitmap.BeginInit();
+                                        bitmap.StreamSource = ms;
+                                        bitmap.EndInit();
+                                        faviconImage.Source = bitmap;
+                                    }
+                                }
+                                else
+                                {
+                                    // 兜底使用默认图标（这里可以设置一个默认的 BitmapImage）
+                                    faviconImage.Source = null; // 或设置默认
+                                }
+                            }
+                            catch
+                            {
+                                faviconImage.Source = null;
+                            }
+                        }
+                        else
+                        {
+                            faviconImage.Source = null;
+                        }
                     }
                 }
             }

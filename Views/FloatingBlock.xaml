@@ -6,11 +6,13 @@
         xmlns:local="clr-namespace:CyberNote.Views"
         mc:Ignorable="d"
         Title="FloatingBlock" Height="50" Width="50"
-        WindowStyle="None" AllowsTransparency="True" Background="White"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseRightButtonDown="Window_MouseRightButtonDown">
     <Grid>
-        <Image x:Name="FaviconImage" Stretch="Uniform" />
+        <Border CornerRadius="10" Background="White" BorderBrush="Gray" BorderThickness="1">
+            <Image x:Name="FaviconImage" Stretch="Uniform" Margin="5" />
+        </Border>
     </Grid>
 </Window>

@@ -18,6 +18,7 @@
   <ItemGroup>
     <None Include=".github\workflows\build-release.yml" />
     <None Include="Source/Icon/favicon.ico" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Source/Icon/favicon.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

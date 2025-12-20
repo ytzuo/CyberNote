@@ -74,11 +74,21 @@ namespace CyberNote
             var contextMenu = new ContextMenuStrip();
             _showHideMenuItem = new ToolStripMenuItem("隐藏", null, ShowHideWindow);
             contextMenu.Items.Add(_showHideMenuItem);
-            contextMenu.Items.Add("退出", null, (s, e) => { _isExit = true; Close(); });
+            contextMenu.Items.Add("退出", null, (s, e) => { ExitApplication(); });
             _notifyIcon.ContextMenuStrip = contextMenu;
 
             // 双击托盘图标显示窗口
-            _notifyIcon.DoubleClick += (s, e) => { Show(); WindowState = WindowState.Normal; Activate(); };
+            _notifyIcon.DoubleClick += (s, e) =>
+            {
+                if (!_isExit)
+                {
+                    Show();
+                    WindowState = WindowState.Normal;
+                    Activate();
+                    _floatingBlock.Hide();
+                    _showHideMenuItem.Text = "隐藏";
+                }
+            };
 
             SetAutoStart();
         }
@@ -244,13 +254,7 @@ namespace CyberNote
             if (vm.ReplaceMainCard.CanExecute(newCard))
                 vm.ReplaceMainCard.Execute(newCard);
         }
-
-        // 当前筛选类型状态（0=全部, 1=随手记, 2=任务列表）
-        private int _filterTypeState = 0;
-        private readonly string[] _filterTypeLabels = { "全部", "随手记", "任务列表" };
-
-        // 当前排序状态（true=降序, false=升序）
-        private bool _sortDescending = true;
+   
 
         /// <summary>
         /// 按种类筛选按钮点击：循环切换（全部 → 随手记 → 任务列表 → 全部...）
@@ -303,14 +307,30 @@ namespace CyberNote
             {
                 e.Cancel = true; // 取消关闭事件
                 Hide();
+                _floatingBlock.Show();
+                _showHideMenuItem.Text = "显示";
             }
             else
             {
-                _notifyIcon.Dispose();
-                // 退出时关闭悬浮块
-                _floatingBlock.Close();
-                // 退出前确保所有数据已保存（可选，如果所有操作都是即时保存的，这里可能不需要）
-                // 但为了保险起见，可以在这里添加保存逻辑，或者等待挂起的任务
+                // 真正退出时，确保资源被释放
+                try
+                {
+                    if (_floatingBlock != null && _floatingBlock.IsLoaded)
+                    {
+                        _floatingBlock.Close();
+                    }
+                }
+                catch { }
+                
+                try
+                {
+                    if (_notifyIcon != null)
+                    {
+                        _notifyIcon.Visible = false;
+                        _notifyIcon.Dispose();
+                    }
+                }
+                catch { }
             }
         }
 
@@ -327,6 +347,9 @@ namespace CyberNote
 
         private void ShowHideWindow(object sender, EventArgs e)
         {
+            // 防止在退出过程中操作
+            if (_isExit) return;
+
             if (IsVisible)
             {
                 // 隐藏窗口时，关闭所有 popup
@@ -356,7 +379,30 @@ namespace CyberNote
         public void ExitApplication()
         {
             _isExit = true;
-            Close();
+            
+            // 关闭悬浮块
+            try
+            {
+                if (_floatingBlock != null && _floatingBlock.IsLoaded)
+                {
+                    _floatingBlock.Close();
+                }
+            }
+            catch { }
+            
+            // 释放托盘图标
+            try
+            {
+                if (_notifyIcon != null)
+                {
+                    _notifyIcon.Visible = false;
+                    _notifyIcon.Dispose();
+                }
+            }
+            catch { }
+            
+            // 关闭应用程序
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }
