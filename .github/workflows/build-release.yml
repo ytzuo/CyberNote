@@ -2,7 +2,7 @@ name: Build & Release 单文件可执行包
 
 on:
   push:
-    branches: [ main ]          # 也可加 pull_request:
+    branches: [ master ]          # 也可加 pull_request:
   workflow_dispatch:            # 手动触发按钮
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
       # 6. 上传成品到 GitHub Release（自动创建标签）
       - name: Release
         uses: softprops/action-gh-release@v2
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         with:
           tag_name: v${{ github.run_number }}   # 简单用 CI 编号当版本
           name: Release ${{ github.run_number }}
