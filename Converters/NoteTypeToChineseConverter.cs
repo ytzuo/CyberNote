@@ -14,6 +14,7 @@ namespace CyberNote.Converters
             {
                 case "Common": return "随手记";
                 case "List": return "任务列表";
+                case "RichText": return "富文本";
                 default: return "其他";
             }
         }

@@ -163,7 +163,10 @@ namespace CyberNote
                 case "List":
                     await CreateListNote(vm);
                     break;
-                // 可以继续添加其他类型
+                case "RichText":
+                    // await CreateRichTextNote(vm);
+                    break;
+                    // 可以继续添加其他类型
             }
 
             // 关闭类型选择 Popup

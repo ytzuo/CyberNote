@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Linq;
 using System.Windows; // MessageBox
-using Microsoft.Win32; // OpenFileDialog
+using Microsoft.Win32;
+using System.Windows.Markup.Localizer; // OpenFileDialog
 
 namespace CyberNote.Services
 {
@@ -50,6 +51,9 @@ namespace CyberNote.Services
                                     t.Owner = listNote;
                                 list.Add(listNote);
                             }
+                            break;
+                        case "RichText":
+                            // TODO : 完成 RichTextNote 的反序列化
                             break;
                     }
                 }

@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 
 namespace CyberNote.Models
 {
-    public class CommonNote : NoteCard, INotifyPropertyChanged
+    internal class RichTextNote 
     {
         private string _id = string.Empty;
-        public string Type { get; } = "RichText";
         private string _title = "无标题";
         private DateTime _schedule;
         private DateTime _createDate;
         private bool _progress = false;
         private int _priority;
-        private string _content = string.Empty;
-
+        private string _rtfContent = string.Empty;
         public string Id
         {
             get => _id;
             set { if (_id != value) { _id = value; OnPropertyChanged(); } }
         }
+
+        public string Type { get; } = "Common";
 
         public string Title
         {
@@ -58,8 +58,8 @@ namespace CyberNote.Models
 
         public string Content
         {
-            get => _content;
-            set { if (_content != value) { _content = value; OnPropertyChanged(); } }
+            get => _rtfContent;
+            set { if (_rtfContent != value) { _rtfContent = value; OnPropertyChanged(); } }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -70,21 +70,21 @@ namespace CyberNote.Models
         }
 
         //无参构造函数
-        public CommonNote() { }
+        public RichTextNote() { }
 
         //有参构造函数
-        public CommonNote(string id, string title, DateTime schedule, int priority, string content)
+        public RichTextNote(string id, string title, DateTime schedule, int priority, string rtfContent)
         {
             _id = id;
             _title = title;
             _schedule = schedule;
             _priority = priority;
-            _content = content;
+            _rtfContent = rtfContent;
             _progress = false; // 默认状态
         }
 
         // Backward-compatible overload auto-generating id
-        public CommonNote(string title, DateTime schedule, int priority, string content)
+        public RichTextNote(string title, DateTime schedule, int priority, string content)
             : this(Guid.NewGuid().ToString(), title, schedule, priority, content) { }
 
         //切换完成情况

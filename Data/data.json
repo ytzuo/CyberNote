@@ -19,11 +19,11 @@
     "Tasks": [
       {
         "Content": "复习",
-        "Progress": false
+        "Progress": true
       },
       {
         "Content": "腾讯求职训练营",
-        "Progress": false
+        "Progress": true
       },
       {
         "Content": "学习vue",
@@ -32,6 +32,32 @@
       {
         "Content": "修复CyberNote的bug",
         "Progress": true
+      },
+      {
+        "Content": "自动驾驶Project",
+        "Progress": false
+      }
+    ]
+  },
+  {
+    "id": "3a1af06a-63c9-4078-9e76-2821ec6c6394",
+    "Type": "List",
+    "Title": "14周待办",
+    "Content": "自动驾驶Project",
+    "createDate": "2025-12-22T18:39:59.6567602+08:00",
+    "Priority": 0,
+    "Tasks": [
+      {
+        "Content": "自动驾驶Project",
+        "Progress": false
+      },
+      {
+        "Content": "劳动教育报告",
+        "Progress": false
+      },
+      {
+        "Content": "完成操作系统专题实践",
+        "Progress": false
       }
     ]
   }
