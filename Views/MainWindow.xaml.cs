@@ -270,7 +270,8 @@ namespace CyberNote
                 {
                     "All" => "Common",
                     "Common" => "List",
-                    "List" => "All",
+                    "List" => "RichText",
+                    "RichText" => "All",
                     _ => "All"
                 };
                 FilterTypeText.Text = vm.FilterType switch
@@ -278,6 +279,7 @@ namespace CyberNote
                     "All" => "全部",
                     "Common" => "随手记",
                     "List" => "任务列表",
+                    "RichText" => "富文本",
                     _ => "全部"
                 };
                 typeFont.Text = vm.FilterType switch
@@ -285,6 +287,7 @@ namespace CyberNote
                     "All" => "≡",       // 所有类型图标
                     "Common" => "📝",    // 随手记图标
                     "List" => "✓",      // 任务列表图标
+                    "RichText" => "🅡",
                     _ => "≡"
                 };
             }

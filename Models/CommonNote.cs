@@ -12,7 +12,7 @@ namespace CyberNote.Models
     public class CommonNote : NoteCard, INotifyPropertyChanged
     {
         private string _id = string.Empty;
-        public string Type { get; } = "RichText";
+        public string Type { get; } = "Common";
         private string _title = "无标题";
         private DateTime _schedule;
         private DateTime _createDate;
