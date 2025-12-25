@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace CyberNote.Models
 {
-    internal class RichTextNote 
+    public class RichTextNote : NoteCard
     {
         private string _id = string.Empty;
         private string _title = "无标题";
         private DateTime _schedule;
-        private DateTime _createDate;
+        private DateTime _createDate = DateTime.Now;
         private bool _progress = false;
         private int _priority;
         private string _rtfContent = string.Empty;
@@ -24,7 +24,7 @@ namespace CyberNote.Models
             set { if (_id != value) { _id = value; OnPropertyChanged(); } }
         }
 
-        public string Type { get; } = "Common";
+        public string Type { get; } = "RichText";
 
         public string Title
         {

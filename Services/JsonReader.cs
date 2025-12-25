@@ -53,7 +53,14 @@ namespace CyberNote.Services
                             }
                             break;
                         case "RichText":
-                            // TODO : 完成 RichTextNote 的反序列化
+                            var rich = JsonSerializer.Deserialize<RichTextNote>(el.GetRawText());
+                            if (rich != null)
+                            {
+                                if (string.IsNullOrWhiteSpace(rich.Id)) rich.Id = id;
+                                // ensure createDate default
+                                if (rich.createDate == default) rich.createDate = DateTime.Now;
+                                list.Add(rich);
+                            }
                             break;
                     }
                 }

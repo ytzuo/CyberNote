@@ -303,7 +303,7 @@
                     <!-- 富文本类型 -->
                     <Button Style="{StaticResource FlatButton}" 
                             Height="40"
-                            Tag="List"
+                            Tag="RichText"
                             Click="CardTypeButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🅡" FontSize="18" Margin="0,0,8,0"/>

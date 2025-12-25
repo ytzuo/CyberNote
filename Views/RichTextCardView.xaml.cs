@@ -9,13 +9,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Security.Permissions;
 
 namespace CyberNote.Views
 {
     /// <summary>
     /// RichTextCard.xaml 的交互逻辑
     /// </summary>
-    public partial class RichTextCard : System.Windows.Controls.UserControl, INotifyPropertyChanged
+    public partial class RichTextCardView : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
         private bool _isEditMode = false;
 
@@ -54,10 +55,16 @@ namespace CyberNote.Views
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public RichTextCard()
+        public RichTextCardView()
         {
             InitializeComponent();
             this.DataContextChanged += RichTextCard_DataContextChanged;
+        }
+
+        public RichTextCardView(RichTextNote note)
+        {
+            InitializeComponent();
+            DataContext = note ?? throw new ArgumentNullException(nameof(note));
         }
 
         private void RichTextCard_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -127,13 +134,13 @@ namespace CyberNote.Views
         {
             IsEditMode = false;
             // 保存到 JSON
-            if (DataContext is CommonNote note)
+            if (DataContext is RichTextNote note)
             {
                 _ = SaveNoteAsync(note);
             }
         }
 
-        private async Task SaveNoteAsync(CommonNote note)
+        private async Task SaveNoteAsync(RichTextNote note)
         {
             try
             {
@@ -165,10 +172,26 @@ namespace CyberNote.Views
                 IsEditMode = false;
                 e.Handled = true;
 
-                if (DataContext is CommonNote note)
+                if (DataContext is RichTextNote note)
                 {
                     _ = SaveNoteAsync(note);
                 }
+            }
+        }
+
+        private void EnlargeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine($"[EnlargeBtn_Click] 开始，DataContext={(DataContext is RichTextNote ? "RichTextNote" : "非 RichTextNote")}");
+
+            if (DataContext is RichTextNote note)
+            {
+                var dlg = new RichTextFullWindow(note)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                dlg.ShowDialog();
+                // 对话框关闭后刷新小卡片的查看内容
+                LoadContentToViewer();
             }
         }
     }

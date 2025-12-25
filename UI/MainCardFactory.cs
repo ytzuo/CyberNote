@@ -16,7 +16,8 @@ namespace CyberNote.UI
             new Dictionary<string, Func<NoteCard, object>>(StringComparer.OrdinalIgnoreCase)
             {
                 ["common"] = data => new CommonCardView((CommonNote)data),
-                ["list"] = data => new ListCardView((ListNote)data)
+                ["list"] = data => new ListCardView((ListNote)data),
+                ["richText"] = data => new RichTextCardView((RichTextNote)data),
                 // 新增类型只需在这里添加一行
             };
 

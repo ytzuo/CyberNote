@@ -164,7 +164,7 @@ namespace CyberNote
                     await CreateListNote(vm);
                     break;
                 case "RichText":
-                    // await CreateRichTextNote(vm);
+                    await CreateRichTextNote(vm);
                     break;
                     // 可以继续添加其他类型
             }
@@ -214,7 +214,7 @@ namespace CyberNote
 
         private async Task CreateCommonNote(MainWindowViewModel vm)
         {
-            var content = "点击编辑内容...\n第二行示例";
+            var content = "双击编辑内容...\n第二行示例";
             var note = new Models.CommonNote("新随手记", DateTime.Now, 0, content) 
                     { createDate = DateTime.Now };
             var newCard = new ThumbnailCardViewModel(note)
@@ -257,7 +257,28 @@ namespace CyberNote
             if (vm.ReplaceMainCard.CanExecute(newCard))
                 vm.ReplaceMainCard.Execute(newCard);
         }
-   
+
+        private async Task CreateRichTextNote(MainWindowViewModel vm)
+        {
+            var content = "双击编辑内容...\n第二行示例";
+            var note = new Models.RichTextNote("新富文本笔记", DateTime.Now, 0, content);
+            var newCard = new ThumbnailCardViewModel(note)
+            {
+                Type = note.Type,
+                CreateDate = note.createDate,
+                Title = note.Title,
+            };
+            newCard.BuildContentPreview();
+
+            // 插入到正确位置（降序时在开头）
+            vm.ThumbnailCards.Insert(0, newCard);
+            await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
+
+            // 自动切换到新创建的卡片
+            if (vm.ReplaceMainCard.CanExecute(newCard))
+                vm.ReplaceMainCard.Execute(newCard);
+        }
+
 
         /// <summary>
         /// 按种类筛选按钮点击：循环切换（全部 → 随手记 → 任务列表 → 全部...）
