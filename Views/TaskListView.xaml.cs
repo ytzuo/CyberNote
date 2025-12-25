@@ -99,5 +99,17 @@ namespace CyberNote.Views
                 }
             }
         }
+
+        private async void DeleteTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && btn.DataContext is TaskItem task)
+            {
+                if (Window.GetWindow(this)?.DataContext is CyberNote.ViewModels.MainWindowViewModel vm && DataContext is ListNote list)
+                {
+                    list.Tasks.Remove(task);
+                    await SaveCurrentListNote();
+                }
+            }
+        }
     }
 }

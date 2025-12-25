@@ -20,6 +20,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- 查看模式文本 -->
@@ -78,6 +79,21 @@
                                   ToolTip="标记已完成"
                                   Checked="TaskProgress_Changed"
                                   Unchecked="TaskProgress_Changed"/>
+
+                        <!-- 删除按钮（仅编辑模式显示） -->
+                        <Button Grid.Column="2"
+                                Content="✕"
+                                Width="24"
+                                Height="24"
+                                Margin="8,0,0,0"
+                                Padding="0"
+                                FontSize="14"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Foreground="#CC0000"
+                                Cursor="Hand"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"
+                                Click="DeleteTask_Click"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
