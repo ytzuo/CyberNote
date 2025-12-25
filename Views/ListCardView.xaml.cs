@@ -84,7 +84,7 @@ namespace CyberNote.Views
             // 新增任务项到末尾
             if (DataContext is ListNote list)
             {
-                var task = new TaskItem("新任务");
+                var task = new TaskItem("新任务(不在编辑状态时双击开始编辑)");
                 list.AddTask(task);
                 task.IsEditing = true; // 默认进入编辑模式，方便立即输入
                 

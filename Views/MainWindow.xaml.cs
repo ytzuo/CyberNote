@@ -234,7 +234,7 @@ namespace CyberNote
 
         private async Task CreateListNote(MainWindowViewModel vm)
         {
-            var note = new Models.ListNote("新任务列表", 0, "双击添加任务", new List<Models.TaskItem>()) 
+            var note = new Models.ListNote("新任务列表", 0, "暂无任务", new List<Models.TaskItem>()) 
             { 
                 createDate = DateTime.Now 
             };
