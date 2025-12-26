@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Security.Permissions;
+using System.Text;
 
 namespace CyberNote.Views
 {
@@ -64,57 +65,59 @@ namespace CyberNote.Views
         public RichTextCardView(RichTextNote note)
         {
             InitializeComponent();
+            this.DataContextChanged += RichTextCard_DataContextChanged;
             DataContext = note ?? throw new ArgumentNullException(nameof(note));
+            LoadContentToViewer();
         }
 
         private void RichTextCard_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            // DataContext 变化时加载内容到查看器
             LoadContentToViewer();
         }
 
         private void LoadContentToViewer()
         {
-            if (DataContext is CommonNote note && !string.IsNullOrEmpty(note.Content))
-            {
-                try
-                {
-                    var doc = new FlowDocument();
-                    var paragraph = new Paragraph(new Run(note.Content));
-                    doc.Blocks.Add(paragraph);
-                    ContentViewer.Document = doc;
-                }
-                catch { }
-            }
+            if (DataContext is not RichTextNote note) { ContentViewer.Document = new FlowDocument(); return; }
+            ContentViewer.Document = CreateFlowDocumentFromRtf(note.Content);
         }
 
         private void LoadContentToEditor()
         {
-            if (DataContext is CommonNote note && !string.IsNullOrEmpty(note.Content))
-            {
-                try
-                {
-                    var doc = new FlowDocument();
-                    var paragraph = new Paragraph(new Run(note.Content));
-                    doc.Blocks.Add(paragraph);
-                    ContentEditor.Document = doc;
-                }
-                catch { }
-            }
+            if (DataContext is not RichTextNote note) { ContentEditor.Document = new FlowDocument(); return; }
+            ContentEditor.Document = CreateFlowDocumentFromRtf(note.Content);
         }
 
         private void SaveContentFromEditor()
         {
-            if (DataContext is CommonNote note)
+            if (DataContext is not RichTextNote note) return;
+            note.Content = SaveRtfFromRichTextBox(ContentEditor);
+            LoadContentToViewer();
+        }
+
+        private static FlowDocument CreateFlowDocumentFromRtf(string? rtf)
+        {
+            var doc = new FlowDocument();
+            if (string.IsNullOrEmpty(rtf)) return doc;
+            try
             {
-                try
-                {
-                    var range = new TextRange(ContentEditor.Document.ContentStart, ContentEditor.Document.ContentEnd);
-                    note.Content = range.Text;
-                    LoadContentToViewer();
-                }
-                catch { }
+                var tr = new TextRange(doc.ContentStart, doc.ContentEnd);
+                using var ms = new MemoryStream(Encoding.UTF8.GetBytes(rtf));
+                tr.Load(ms, System.Windows.DataFormats.Rtf);
             }
+            catch
+            {
+                doc.Blocks.Clear();
+                doc.Blocks.Add(new Paragraph(new Run(rtf)));
+            }
+            return doc;
+        }
+
+        private static string SaveRtfFromRichTextBox(System.Windows.Controls.RichTextBox rtb)
+        {
+            var range = new TextRange(rtb.Document.ContentStart, rtb.Document.ContentEnd);
+            using var ms = new MemoryStream();
+            range.Save(ms, System.Windows.DataFormats.Rtf);
+            return Encoding.UTF8.GetString(ms.ToArray());
         }
 
         /// <summary>

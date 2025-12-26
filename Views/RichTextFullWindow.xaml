@@ -26,10 +26,10 @@
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                 <Button Content="查看" Padding="10,4" Click="ViewMode_Click"
-                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVis}}"
+                        Visibility="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                         Margin="0,0,6,0"/>
                 <Button Content="编辑" Padding="10,4" Click="EditMode_Click"
-                        Visibility="{Binding IsViewMode, Converter={StaticResource BoolToVis}}"
+                        Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                         Margin="0,0,6,0"/>
             </StackPanel>
         </DockPanel>
@@ -38,14 +38,14 @@
         <Grid Grid.Row="1" Margin="10">
             <!-- 查看模式 -->
             <FlowDocumentScrollViewer x:Name="Viewer"
-                                      Visibility="{Binding IsViewMode, Converter={StaticResource BoolToVis}}"
+                                      Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                                       IsToolBarVisible="False"
                                       VerticalScrollBarVisibility="Auto"
                                       Background="Transparent" />
 
             <!-- 编辑模式 -->
             <RichTextBox x:Name="Editor"
-                         Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVis}}"
+                         Visibility="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                          VerticalScrollBarVisibility="Auto"
                          AcceptsReturn="True"
                          AcceptsTab="True"

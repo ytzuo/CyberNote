@@ -58,6 +58,7 @@
                                           VerticalScrollBarVisibility="Disabled"
                                           Background="Transparent"
                                           MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
+                                          PreviewMouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
                                           Cursor="Hand"/>
             </ScrollViewer>
             
