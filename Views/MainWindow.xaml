@@ -215,7 +215,7 @@
                         <TextBlock Text="＋" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
 
-                    <!-- 悬浮修改文件路径按钮 -->
+                    <!-- 悬浮设置按钮 -->
                     <Button Grid.Row="1" Background="#4CAF50" 
                             Width="40" 
                             Height="40" 
@@ -299,7 +299,18 @@
                             <TextBlock Text="任务列表" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    
+
+                    <!-- 富文本类型 -->
+                    <Button Style="{StaticResource FlatButton}" 
+                            Height="40"
+                            Tag="RichText"
+                            Click="CardTypeButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🅡" FontSize="18" Margin="0,0,8,0"/>
+                            <TextBlock Text="富文本" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- 可以继续添加更多类型 -->
                 </StackPanel>
             </Border>

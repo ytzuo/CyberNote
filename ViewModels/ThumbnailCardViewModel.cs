@@ -20,7 +20,7 @@ namespace CyberNote.ViewModels
         // 完整数据模型
         public NoteCard? Note { get; set; }
 
-        private string _type = "Common";
+        private string _type = NoteType.CommonName;
         private DateTime _createDate = DateTime.Now;
         private string _title = string.Empty;
         private string _contentPreview = string.Empty;
@@ -122,7 +122,7 @@ namespace CyberNote.ViewModels
             Note = note;
             Title = note.Title;
             Type = note.Type;
-            CreateDate = (note as CommonNote)?.createDate != default ? (note as CommonNote)!.createDate : DateTime.Now;
+            CreateDate = note.createDate != default ? note.createDate : DateTime.Now;
             
             WireNoteEvents();
             WireTaskEvents();
@@ -185,6 +185,13 @@ namespace CyberNote.ViewModels
 
         public void BuildContentPreview()
         {
+            // 富文本直接使用占位提示
+            if (string.Equals(Type, NoteType.RichTextName, StringComparison.OrdinalIgnoreCase))
+            {
+                ContentPreview = "暂不支持预览...";
+                return;
+            }
+
             var raw = Note?.Content ?? string.Empty;
             if (string.IsNullOrWhiteSpace(raw))
             {

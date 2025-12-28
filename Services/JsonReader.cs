@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Linq;
 using System.Windows; // MessageBox
-using Microsoft.Win32; // OpenFileDialog
+using Microsoft.Win32;
+using System.Windows.Markup.Localizer; // OpenFileDialog
+using CyberNote.Services;
 
 namespace CyberNote.Services
 {
@@ -33,7 +35,7 @@ namespace CyberNote.Services
 
                     switch (type)
                     {
-                        case "Common":
+                        case NoteType.CommonName:
                             var common = JsonSerializer.Deserialize<CommonNote>(el.GetRawText());
                             if (common != null)
                             {
@@ -41,7 +43,7 @@ namespace CyberNote.Services
                                 list.Add(common);
                             }
                             break;
-                        case "List":
+                        case NoteType.ListName:
                             var listNote = JsonSerializer.Deserialize<ListNote>(el.GetRawText());
                             if (listNote != null)
                             {
@@ -49,6 +51,16 @@ namespace CyberNote.Services
                                 foreach (var t in listNote.Tasks)
                                     t.Owner = listNote;
                                 list.Add(listNote);
+                            }
+                            break;
+                        case NoteType.RichTextName:
+                            var rich = JsonSerializer.Deserialize<RichTextNote>(el.GetRawText());
+                            if (rich != null)
+                            {
+                                if (string.IsNullOrWhiteSpace(rich.Id)) rich.Id = id;
+                                // ensure createDate default
+                                if (rich.createDate == default) rich.createDate = DateTime.Now;
+                                list.Add(rich);
                             }
                             break;
                     }

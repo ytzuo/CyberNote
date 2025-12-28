@@ -157,13 +157,16 @@ namespace CyberNote
             // 根据选择的类型创建新卡片
             switch (cardType)
             {
-                case "Common":
+                case NoteType.CommonName:
                     await CreateCommonNote(vm);
                     break;
-                case "List":
+                case NoteType.ListName:
                     await CreateListNote(vm);
                     break;
-                // 可以继续添加其他类型
+                case NoteType.RichTextName:
+                    await CreateRichTextNote(vm);
+                    break;
+                    // 可以继续添加其他类型
             }
 
             // 关闭类型选择 Popup
@@ -211,7 +214,7 @@ namespace CyberNote
 
         private async Task CreateCommonNote(MainWindowViewModel vm)
         {
-            var content = "点击编辑内容...\n第二行示例";
+            var content = "双击编辑内容...\n第二行示例";
             var note = new Models.CommonNote("新随手记", DateTime.Now, 0, content) 
                     { createDate = DateTime.Now };
             var newCard = new ThumbnailCardViewModel(note)
@@ -254,7 +257,28 @@ namespace CyberNote
             if (vm.ReplaceMainCard.CanExecute(newCard))
                 vm.ReplaceMainCard.Execute(newCard);
         }
-   
+
+        private async Task CreateRichTextNote(MainWindowViewModel vm)
+        {
+            var content = "双击编辑内容...\n第二行示例";
+            var note = new Models.RichTextNote("新富文本笔记", DateTime.Now, 0, content);
+            var newCard = new ThumbnailCardViewModel(note)
+            {
+                Type = note.Type,
+                CreateDate = note.createDate,
+                Title = note.Title,
+            };
+            newCard.BuildContentPreview();
+
+            // 插入到正确位置（降序时在开头）
+            vm.ThumbnailCards.Insert(0, newCard);
+            await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
+
+            // 自动切换到新创建的卡片
+            if (vm.ReplaceMainCard.CanExecute(newCard))
+                vm.ReplaceMainCard.Execute(newCard);
+        }
+
 
         /// <summary>
         /// 按种类筛选按钮点击：循环切换（全部 → 随手记 → 任务列表 → 全部...）
@@ -265,23 +289,26 @@ namespace CyberNote
             {
                 vm.FilterType = vm.FilterType switch
                 {
-                    "All" => "Common",
-                    "Common" => "List",
-                    "List" => "All",
+                    "All" => NoteType.CommonName,
+                    NoteType.CommonName => NoteType.ListName,
+                    NoteType.ListName => NoteType.RichTextName,
+                    NoteType.RichTextName => "All",
                     _ => "All"
                 };
                 FilterTypeText.Text = vm.FilterType switch
                 {
                     "All" => "全部",
-                    "Common" => "随手记",
-                    "List" => "任务列表",
+                    NoteType.CommonName => "随手记",
+                    NoteType.ListName => "任务列表",
+                    NoteType.RichTextName => "富文本",
                     _ => "全部"
                 };
                 typeFont.Text = vm.FilterType switch
                 {
                     "All" => "≡",       // 所有类型图标
-                    "Common" => "📝",    // 随手记图标
-                    "List" => "✓",      // 任务列表图标
+                    NoteType.CommonName => "📝",    // 随手记图标
+                    NoteType.ListName => "✓",      // 任务列表图标
+                    NoteType.RichTextName => "🅡",
                     _ => "≡"
                 };
             }

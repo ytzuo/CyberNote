@@ -102,7 +102,7 @@
                            FontSize="12"/>
 
                 <TextBlock Grid.Column="1"
-                           Text="{Binding Schedule, StringFormat='下一任务: {0:MM-dd HH:mm}'}"
+                           Text="{Binding Schedule, StringFormat=' '}"
                            Foreground="#666666"
                            FontSize="12"/>
             </Grid>
