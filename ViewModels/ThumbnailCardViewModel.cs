@@ -185,6 +185,13 @@ namespace CyberNote.ViewModels
 
         public void BuildContentPreview()
         {
+            // 富文本直接使用占位提示
+            if (string.Equals(Type, "RichText", StringComparison.OrdinalIgnoreCase))
+            {
+                ContentPreview = "暂不支持预览...";
+                return;
+            }
+
             var raw = Note?.Content ?? string.Empty;
             if (string.IsNullOrWhiteSpace(raw))
             {

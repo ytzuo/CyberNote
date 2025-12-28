@@ -15,7 +15,15 @@ namespace CyberNote.Views
                 nameof(Type),
                 typeof(string),
                 typeof(ThumbnailCard),
-                new PropertyMetadata("Common")); // 默认值
+                new PropertyMetadata("Common", OnTypeChanged));
+
+        private static void OnTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ThumbnailCard card)
+            {
+                card.CoerceValue(ContentPreviewProperty);
+            }
+        }
 
         // 依赖属性：创建日期
         public static readonly DependencyProperty CreateDateProperty =
@@ -39,7 +47,16 @@ namespace CyberNote.Views
                 nameof(ContentPreview),
                 typeof(string),
                 typeof(ThumbnailCard),
-                new PropertyMetadata(""));
+                new PropertyMetadata(string.Empty, null, CoerceContentPreview));
+
+        private static object CoerceContentPreview(DependencyObject d, object baseValue)
+        {
+            if (d is ThumbnailCard card && string.Equals(card.Type, "RichText", StringComparison.OrdinalIgnoreCase))
+            {
+                return "[富文本预览暂不支持]";
+            }
+            return baseValue ?? string.Empty;
+        }
 
         // 暴露公共属性（自动支持绑定）
         public string Type
@@ -62,8 +79,8 @@ namespace CyberNote.Views
 
         public string ContentPreview
         {
-            get { return (string)GetValue(ContentPreviewProperty); }
-            set { SetValue(ContentPreviewProperty, value); }
+            get => (string)GetValue(ContentPreviewProperty);
+            set => SetValue(ContentPreviewProperty, value);
         }
 
         public ThumbnailCard()

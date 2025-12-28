@@ -10,6 +10,41 @@
         ResizeMode="CanResize">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#4CAF50"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5" SnapsToDevicePixels="True" Padding="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#66C17A"/>
+                                <Setter TargetName="bd" Property="Background" Value="#F8FFFA"/>
+                                <Setter TargetName="bd" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#AA66C17A" BlurRadius="5" ShadowDepth="0" Opacity="0.6"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#E8F5E9"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#4CAF50"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid Background="White">
         <Grid.RowDefinitions>
@@ -20,17 +55,19 @@
         <!-- 顶部栏 -->
         <DockPanel Grid.Row="0" Margin="10">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                <TextBlock Text="标题：" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <TextBox Width="280" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="标题：" FontWeight="SemiBold" FontSize="22" VerticalAlignment="Center"/>
+                <TextBox Width="320" FontSize="22" Padding="10,6" BorderBrush="#CCCCCC" BorderThickness="1" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
-
+            
+            <!-- 中间只留固定间隙 -->
+            <Border Width="20" DockPanel.Dock="Left"/>
+            
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                <Button Content="查看" Padding="10,4" Click="ViewMode_Click"
-                        Visibility="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
-                        Margin="0,0,6,0"/>
-                <Button Content="编辑" Padding="10,4" Click="EditMode_Click"
-                        Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
-                        Margin="0,0,6,0"/>
+                <Button Style="{StaticResource PrimaryButton}" Content=" 查看 " Click="ViewMode_Click"
+                Visibility="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"/>
+                
+                <Button Style="{StaticResource PrimaryButton}" Content=" 编辑 " Click="EditMode_Click"
+                Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
         </DockPanel>
 
@@ -41,7 +78,7 @@
                                       Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                                       IsToolBarVisible="False"
                                       VerticalScrollBarVisibility="Auto"
-                                      Background="Transparent" />
+                                      Background="White" />
 
             <!-- 编辑模式 -->
             <RichTextBox x:Name="Editor"
@@ -50,7 +87,9 @@
                          AcceptsReturn="True"
                          AcceptsTab="True"
                          BorderThickness="1"
-                         BorderBrush="#4CAF50" />
+                         BorderBrush="#4CAF50"
+                         FontSize="14"
+                         Padding="10" />
         </Grid>
     </Grid>
 </Window>
