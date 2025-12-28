@@ -215,7 +215,7 @@
                         <TextBlock Text="＋" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
 
-                    <!-- 悬浮修改文件路径按钮 -->
+                    <!-- 悬浮设置按钮 -->
                     <Button Grid.Row="1" Background="#4CAF50" 
                             Width="40" 
                             Height="40" 

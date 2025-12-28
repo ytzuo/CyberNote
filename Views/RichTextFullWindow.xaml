@@ -7,11 +7,13 @@
         Title="RichText" Height="600" Width="800"
         WindowStartupLocation="CenterOwner"
         WindowStyle="SingleBorderWindow"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        LocationChanged="Window_LocationChanged"
+        SizeChanged="Window_SizeChanged">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="Padding" Value="12,6"/>
             <Setter Property="Foreground" Value="#2C3E50"/>
             <Setter Property="Background" Value="White"/>
@@ -56,23 +58,23 @@
         <DockPanel Grid.Row="0" Margin="10">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                 <TextBlock Text="标题：" FontWeight="SemiBold" FontSize="22" VerticalAlignment="Center"/>
-                <TextBox Width="320" FontSize="22" Padding="10,6" BorderBrush="#CCCCCC" BorderThickness="1" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Width="320" FontSize="22" Padding="10,6" BorderBrush="#CCCCCC" BorderThickness="1" FontWeight="Bold" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
-            
+
             <!-- 中间只留固定间隙 -->
             <Border Width="20" DockPanel.Dock="Left"/>
-            
+
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                 <Button Style="{StaticResource PrimaryButton}" Content=" 查看 " Click="ViewMode_Click"
                 Visibility="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"/>
-                
+
                 <Button Style="{StaticResource PrimaryButton}" Content=" 编辑 " Click="EditMode_Click"
                 Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
         </DockPanel>
 
         <!-- 内容区 -->
-        <Grid Grid.Row="1" Margin="10">
+        <Grid Grid.Row="1" Margin="20">
             <!-- 查看模式 -->
             <FlowDocumentScrollViewer x:Name="Viewer"
                                       Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
@@ -91,5 +93,57 @@
                          FontSize="14"
                          Padding="10" />
         </Grid>
+        <!-- 右下角帮助按钮 -->
+        <Button x:Name="InfoButton" Grid.Row="1" Background="#4CAF50" 
+                Width="40" 
+                Height="40" 
+                BorderThickness="0"
+                Click="FloatingInfoButton_Click" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Bottom" 
+                Margin="0,0,50,50" 
+                Panel.ZIndex="1" 
+                Cursor="Hand">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" 
+                    CornerRadius="20" 
+                    SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#45A049"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#3D8B40"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+            <TextBlock Text="?" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Button>
+
+        <!-- 帮助 Popup：向右展开 -->
+        <Popup x:Name="InfoPopup"
+               PlacementTarget="{Binding ElementName=InfoButton}"
+               Placement="Right"
+               StaysOpen="True"
+               AllowsTransparency="True">
+            <Border Background="#FFFFFF" BorderBrush="#4CAF50" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Border.Effect>
+                    <DropShadowEffect Color="#AA66C17A" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                </Border.Effect>
+                <StackPanel MaxWidth="320">
+                    <TextBlock Text="富文本快捷键" FontWeight="Bold" FontSize="16"/>
+                    <TextBlock Text="· Ctrl + B：加粗" TextWrapping="Wrap" FontSize="15"/>
+                    <TextBlock Text="· Ctrl + I：斜体" TextWrapping="Wrap" FontSize="15"/>
+                    <TextBlock Text="· Ctrl + U：下划线" TextWrapping="Wrap" FontSize="15"/>
+                    <TextBlock Text="· Ctrl + Z / Ctrl + Y：撤销 / 重做" TextWrapping="Wrap" FontSize="15"/>
+                    <TextBlock Text="· Enter：换行；Tab：缩进；Shift+Tab：减少缩进" TextWrapping="Wrap" FontSize="15"/>
+                    <TextBlock Text="· Esc：退出编辑并保存" TextWrapping="Wrap" FontSize="15"/>
+                </StackPanel>
+            </Border>
+        </Popup>
     </Grid>
 </Window>

@@ -96,7 +96,7 @@ namespace CyberNote.Views
 
         private static FlowDocument CreateFlowDocumentFromRtf(string? rtf)
         {
-            var doc = new FlowDocument();
+            var doc = new FlowDocument { PagePadding = new Thickness(0) };
             if (string.IsNullOrEmpty(rtf)) return doc;
             try
             {
@@ -114,6 +114,8 @@ namespace CyberNote.Views
 
         private static string SaveRtfFromRichTextBox(System.Windows.Controls.RichTextBox rtb)
         {
+            // 确保编辑器文档无额外页边距
+            rtb.Document.PagePadding = new Thickness(0);
             var range = new TextRange(rtb.Document.ContentStart, rtb.Document.ContentEnd);
             using var ms = new MemoryStream();
             range.Save(ms, System.Windows.DataFormats.Rtf);
