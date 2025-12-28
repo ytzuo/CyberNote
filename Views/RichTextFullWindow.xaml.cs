@@ -4,7 +4,6 @@ using System;
 using System.ComponentModel;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 
 namespace CyberNote.Views
@@ -142,9 +141,10 @@ namespace CyberNote.Views
             if (InfoPopup == null) return;
             if (InfoPopup.IsOpen)
             {
-                // 通过临时关闭再打开让 Popup 重算位置
-                InfoPopup.IsOpen = false;
-                InfoPopup.IsOpen = true;
+                // 通过轻微调整偏移量让 Popup 重算位置，而不是临时关闭再打开，避免闪烁和状态丢失
+                double originalOffset = InfoPopup.HorizontalOffset;
+                InfoPopup.HorizontalOffset = originalOffset + 0.1;
+                InfoPopup.HorizontalOffset = originalOffset;
             }
         }
     }

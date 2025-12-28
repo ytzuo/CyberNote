@@ -15,7 +15,7 @@ using System.Text;
 namespace CyberNote.Views
 {
     /// <summary>
-    /// RichTextCard.xaml 的交互逻辑
+    /// RichTextCardView.xaml 的交互逻辑
     /// </summary>
     public partial class RichTextCardView : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {

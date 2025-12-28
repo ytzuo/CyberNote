@@ -54,7 +54,7 @@ namespace CyberNote.Views
         {
             if (d is ThumbnailCard card && string.Equals(card.Type, NoteType.RichTextName, StringComparison.OrdinalIgnoreCase))
             {
-                return "[富文本预览暂不支持]";
+                return "暂不支持预览...";
             }
             return baseValue ?? string.Empty;
         }
