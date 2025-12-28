@@ -157,13 +157,13 @@ namespace CyberNote
             // 根据选择的类型创建新卡片
             switch (cardType)
             {
-                case "Common":
+                case NoteType.CommonName:
                     await CreateCommonNote(vm);
                     break;
-                case "List":
+                case NoteType.ListName:
                     await CreateListNote(vm);
                     break;
-                case "RichText":
+                case NoteType.RichTextName:
                     await CreateRichTextNote(vm);
                     break;
                     // 可以继续添加其他类型
@@ -289,26 +289,26 @@ namespace CyberNote
             {
                 vm.FilterType = vm.FilterType switch
                 {
-                    "All" => "Common",
-                    "Common" => "List",
-                    "List" => "RichText",
-                    "RichText" => "All",
+                    "All" => NoteType.CommonName,
+                    NoteType.CommonName => NoteType.ListName,
+                    NoteType.ListName => NoteType.RichTextName,
+                    NoteType.RichTextName => "All",
                     _ => "All"
                 };
                 FilterTypeText.Text = vm.FilterType switch
                 {
                     "All" => "全部",
-                    "Common" => "随手记",
-                    "List" => "任务列表",
-                    "RichText" => "富文本",
+                    NoteType.CommonName => "随手记",
+                    NoteType.ListName => "任务列表",
+                    NoteType.RichTextName => "富文本",
                     _ => "全部"
                 };
                 typeFont.Text = vm.FilterType switch
                 {
                     "All" => "≡",       // 所有类型图标
-                    "Common" => "📝",    // 随手记图标
-                    "List" => "✓",      // 任务列表图标
-                    "RichText" => "🅡",
+                    NoteType.CommonName => "📝",    // 随手记图标
+                    NoteType.ListName => "✓",      // 任务列表图标
+                    NoteType.RichTextName => "🅡",
                     _ => "≡"
                 };
             }

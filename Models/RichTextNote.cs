@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using CyberNote.Services;
 
 namespace CyberNote.Models
 {
@@ -24,7 +25,7 @@ namespace CyberNote.Models
             set { if (_id != value) { _id = value; OnPropertyChanged(); } }
         }
 
-        public string Type { get; } = "RichText";
+        public string Type { get; } = NoteType.RichTextName;
 
         public string Title
         {

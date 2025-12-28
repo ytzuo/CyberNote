@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using CyberNote.Services;
 
 namespace CyberNote.Views
 {
@@ -15,7 +16,7 @@ namespace CyberNote.Views
                 nameof(Type),
                 typeof(string),
                 typeof(ThumbnailCard),
-                new PropertyMetadata("Common", OnTypeChanged));
+                new PropertyMetadata(NoteType.CommonName, OnTypeChanged));
 
         private static void OnTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -51,7 +52,7 @@ namespace CyberNote.Views
 
         private static object CoerceContentPreview(DependencyObject d, object baseValue)
         {
-            if (d is ThumbnailCard card && string.Equals(card.Type, "RichText", StringComparison.OrdinalIgnoreCase))
+            if (d is ThumbnailCard card && string.Equals(card.Type, NoteType.RichTextName, StringComparison.OrdinalIgnoreCase))
             {
                 return "[富文本预览暂不支持]";
             }

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using System.Linq;
+using CyberNote.Services;
 
 namespace CyberNote.Models
 {
@@ -12,7 +13,7 @@ namespace CyberNote.Models
     public class ListNote : NoteCard, INotifyPropertyChanged
     {
         public string Id { get; set; } = string.Empty;
-        public string Type { get; } = "List";
+        public string Type { get; } = NoteType.ListName;
         private string _title = "无标题";
         private int _priority;
         private string _content = string.Empty;

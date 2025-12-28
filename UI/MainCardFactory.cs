@@ -1,5 +1,6 @@
 ﻿using CyberNote.Models;
 using CyberNote.Views;
+using CyberNote.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,9 @@ namespace CyberNote.UI
         private static readonly Dictionary<string, Func<NoteCard, object>> _creators =
             new Dictionary<string, Func<NoteCard, object>>(StringComparer.OrdinalIgnoreCase)
             {
-                ["common"] = data => new CommonCardView((CommonNote)data),
-                ["list"] = data => new ListCardView((ListNote)data),
-                ["richText"] = data => new RichTextCardView((RichTextNote)data),
+                [NoteType.CommonName] = data => new CommonCardView((CommonNote)data),
+                [NoteType.ListName] = data => new ListCardView((ListNote)data),
+                [NoteType.RichTextName] = data => new RichTextCardView((RichTextNote)data),
                 // 新增类型只需在这里添加一行
             };
 

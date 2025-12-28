@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using CyberNote.Services;
 
 namespace CyberNote.Converters
 {
@@ -12,9 +13,9 @@ namespace CyberNote.Converters
             if (value == null) return string.Empty;
             switch (value.ToString())
             {
-                case "Common": return "随手记";
-                case "List": return "任务列表";
-                case "RichText": return "富文本";
+                case NoteType.CommonName: return "随手记";
+                case NoteType.ListName: return "任务列表";
+                case NoteType.RichTextName: return "富文本";
                 default: return "其他";
             }
         }

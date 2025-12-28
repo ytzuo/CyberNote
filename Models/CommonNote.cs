@@ -6,13 +6,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using CyberNote.Services;
 
 namespace CyberNote.Models
 {
     public class CommonNote : NoteCard, INotifyPropertyChanged
     {
         private string _id = string.Empty;
-        public string Type { get; } = "Common";
+        public string Type { get; } = NoteType.CommonName;
         private string _title = "无标题";
         private DateTime _schedule;
         private DateTime _createDate;
