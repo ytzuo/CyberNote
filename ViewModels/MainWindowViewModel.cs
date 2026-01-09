@@ -192,6 +192,28 @@ namespace CyberNote.ViewModels
             ExecuteReplaceMainCard(ThumbnailCards.First());
             // 初始化筛选后的列表
             ApplyFilters();
+
+            // 调试：测试读取 records.json
+            //_ = TestReadRecordsAsync();
+        }
+
+        private async Task TestReadRecordsAsync()
+        {
+            try
+            {
+                var rPath = ConfigService.RecordFilePath;
+                Debug.WriteLine($"[Debug] RecordFilePath: {rPath}");
+                var records = await RecordReader.LoadAllRecordsAsync(rPath);
+                Debug.WriteLine($"[Debug] Loaded {records.Count} records.");
+                foreach (var r in records)
+                {
+                    Debug.WriteLine($"[Debug] Record: {r.Date:yyyy-MM-dd} Mood={r.Mood.Name} Count={r.CardCount} Comment={r.Comment}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Debug] Read records failed: {ex.Message}");
+            }
         }
 
         // 排序选项（可扩展）

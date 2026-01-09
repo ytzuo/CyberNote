@@ -101,7 +101,22 @@ namespace CyberNote.Services
             finally { _fileLock.Release(); }
         }
 
-        private static JsonArray LoadExistingArray(string filePath)
+        internal static async Task<JsonArray> LoadExistingArrayAsync(string filePath)
+        {
+            if (!File.Exists(filePath)) return new JsonArray();
+            try
+            {
+                // 使用异步读取
+                var text = await File.ReadAllTextAsync(filePath);
+                text = text.Trim();
+                if (string.IsNullOrEmpty(text)) return new JsonArray();
+                var parsed = JsonNode.Parse(text);
+                return parsed as JsonArray ?? new JsonArray();
+            }
+            catch { return new JsonArray(); }
+        }
+
+        internal static JsonArray LoadExistingArray(string filePath)
         {
             if (!File.Exists(filePath)) return new JsonArray();
             try
@@ -127,7 +142,7 @@ namespace CyberNote.Services
             await File.WriteAllTextAsync(filePath, text);
         }
 
-        public static async Task WriteArrayAtomicAsync(string filePath, JsonArray arr, JsonSerializerOptions options)
+        internal static async Task WriteArrayAtomicAsync(string filePath, JsonArray arr, JsonSerializerOptions options)
         {
             var dir = Path.GetDirectoryName(filePath) ?? ".";
             Directory.CreateDirectory(dir);
