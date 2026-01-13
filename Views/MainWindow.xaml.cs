@@ -118,6 +118,8 @@ namespace CyberNote
             }
             if (ActivityPopup.IsOpen)
             {
+                UpdateActivityPopupPlacement();
+
                 var target = ActivityPopup.PlacementTarget;
                 ActivityPopup.PlacementTarget = null;
                 ActivityPopup.PlacementTarget = target;
@@ -126,6 +128,56 @@ namespace CyberNote
             }
             _lastLocation = new System.Windows.Point(Left, Top);
         }
+
+        private void UpdateActivityPopupPlacement()
+        {
+            if (ActivityPopup.Child is not FrameworkElement child) return;
+
+            // 强制重新测量以获取准确宽度
+            child.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            var popupWidth = child.DesiredSize.Width;
+
+            // 获取当前屏幕的工作区
+            var handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            var screen = System.Windows.Forms.Screen.FromHandle(handle);
+
+            // 获取 DPI缩放比例
+            var source = PresentationSource.FromVisual(this);
+            double dpiScale = 1.0;
+            if (source != null && source.CompositionTarget != null)
+            {
+                dpiScale = source.CompositionTarget.TransformToDevice.M11;
+            }
+
+            // 将屏幕右边界转换为 WPF 坐标
+            double screenRight = screen.WorkingArea.Right / dpiScale;
+
+            double gap = 10;
+            double windowRightEdge = this.Left + this.Width;
+
+            // 计算如果在右侧显示所需的右边界位置
+            double requiredRight = windowRightEdge + gap + popupWidth;
+
+            if (requiredRight > screenRight)
+            {
+                // 空间不足，移动到左侧
+                if (ActivityPopup.Placement != PlacementMode.Left)
+                {
+                    ActivityPopup.Placement = PlacementMode.Left;
+                    ActivityPopup.HorizontalOffset = -10;
+                }
+            }
+            else
+            {
+                // 空间充足，保持在右侧
+                if (ActivityPopup.Placement != PlacementMode.Right)
+                {
+                    ActivityPopup.Placement = PlacementMode.Right;
+                    ActivityPopup.HorizontalOffset = 10;
+                }
+            }
+        }
+
         private void ExtendBtn_Clicked(object sender, RoutedEventArgs e)
         {
             // 切换 Popup 显示
@@ -153,8 +205,15 @@ namespace CyberNote
 
         private void FloatingActivityButton_Click(object sender, RoutedEventArgs e)
         {
-            // 切换 ActivityPopup 的显示状态
-            ActivityPopup.IsOpen = !ActivityPopup.IsOpen;
+            if (!ActivityPopup.IsOpen)
+            {
+                UpdateActivityPopupPlacement();
+                ActivityPopup.IsOpen = true;
+            }
+            else
+            {
+                ActivityPopup.IsOpen = false;
+            }
         }
 
         /// <summary>
