@@ -116,6 +116,14 @@ namespace CyberNote
                 WidePopup.IsOpen = false;
                 WidePopup.IsOpen = true;
             }
+            if (ActivityPopup.IsOpen)
+            {
+                var target = ActivityPopup.PlacementTarget;
+                ActivityPopup.PlacementTarget = null;
+                ActivityPopup.PlacementTarget = target;
+                ActivityPopup.IsOpen = false;
+                ActivityPopup.IsOpen = true;
+            }
             _lastLocation = new System.Windows.Point(Left, Top);
         }
         private void ExtendBtn_Clicked(object sender, RoutedEventArgs e)
@@ -141,6 +149,12 @@ namespace CyberNote
         {
             // 切换类型选择 Popup 的显示状态
             OptionPopup.IsOpen = !OptionPopup.IsOpen;
+        }
+
+        private void FloatingActivityButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 切换 ActivityPopup 的显示状态
+            ActivityPopup.IsOpen = !ActivityPopup.IsOpen;
         }
 
         /// <summary>
@@ -383,6 +397,7 @@ namespace CyberNote
                 TypeSelectorPopup.IsOpen = false;
                 OptionPopup.IsOpen = false;
                 WidePopup.IsOpen = false;
+                ActivityPopup.IsOpen = false;
                 
                 Hide();
                 _showHideMenuItem.Text = "显示";

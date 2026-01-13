@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -22,6 +23,11 @@ namespace CyberNote.ViewModels
     {
         public ObservableCollection<ThumbnailCardViewModel> ThumbnailCards { get; } = new ObservableCollection<ThumbnailCardViewModel>();
         public ICollectionView ThumbnailCardsView { get; private set; }
+        
+        // HeatMap 数据集合
+        public ObservableCollection<HeatMapItemViewModel> HeatMapItems { get; } = new ObservableCollection<HeatMapItemViewModel>();
+
+        public ICommand HeatMapItemClickCommand { get; }
 
         private string _searchText = string.Empty;
         public string SearchText
@@ -151,6 +157,9 @@ namespace CyberNote.ViewModels
             ReplaceMainCard = new RelayCommand<ThumbnailCardViewModel>(ExecuteReplaceMainCard);
             DeleteCard = new RelayCommand<ThumbnailCardViewModel>(async (vm) => await ExecuteDeleteCard(vm));
 
+            // 初始化热力图点击命令
+            HeatMapItemClickCommand = new RelayCommand<HeatMapItemViewModel>(OnHeatMapItemClicked);
+
             ThumbnailCardsView = CollectionViewSource.GetDefaultView(ThumbnailCards);
             ThumbnailCardsView.Filter = FilterPredicate;
             SetSortDescriptions(); // 自定义方法设置 SortDescriptions 根据 CurrentSort 进行排序
@@ -159,6 +168,44 @@ namespace CyberNote.ViewModels
             // 我们可以启动一个不等待的任务，或者将 LoadCard 改回同步，或者在 Loaded 事件中调用
             // 这里选择启动一个不等待的任务，并处理可能的异常
             _ = LoadCardAsync();
+
+            // 初始化热力图数据（预留逻辑）
+            InitializeHeatMapData();
+        }
+
+        private void InitializeHeatMapData()
+        {
+            // TODO: 实现由数据生成 HeatMapItems 的逻辑
+            // 暂时生成模拟数据以展示 UI 效果
+            GenerateDummyHeatMapData(); 
+        }
+
+        private void GenerateDummyHeatMapData()
+        {
+            // 预留：生成不少于 7 列的数据
+            // 这里只是示例，具体逻辑请根据真实数据实现
+            var startDate = DateTime.Today.AddDays(-(7 * 10) + 1); // 10周前
+            // 调整到周一（如果需要）
+            
+            for (int i = 0; i < 7 * 10; i++)
+            {
+                var date = startDate.AddDays(i);
+                HeatMapItems.Add(new HeatMapItemViewModel 
+                { 
+                    Date = date,
+                    Color = "#EBEDF0", // 默认颜色
+                    Count = 0,
+                    Mood = "😐",
+                    NoteSummary = "无记录"
+                });
+            }
+        }
+
+        private void OnHeatMapItemClicked(HeatMapItemViewModel item)
+        {
+            if (item == null) return;
+            // TODO: 双击小方块后的逻辑，例如弹出添加心情/记录的窗口
+            Debug.WriteLine($"HeatMap Item Clicked: {item.Date}");
         }
 
         private async Task LoadCardAsync()
@@ -321,5 +368,27 @@ namespace CyberNote.ViewModels
             // 然后刷新 Filter
             ThumbnailCardsView.Refresh();
         }
+    }
+
+    public class HeatMapItemViewModel : INotifyPropertyChanged
+    {
+        public DateTime Date { get; set; }
+        
+        private string _color = "#EBEDF0"; // 默认浅灰色
+        public string Color 
+        { 
+            get => _color; 
+            set 
+            {
+                _color = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Color)));
+            }
+        }
+
+        public int Count { get; set; }
+        public string Mood { get; set; } = "";
+        public string NoteSummary { get; set; } = "";
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }
