@@ -1,6 +1,8 @@
 using CyberNote.Models;
+using Microsoft.VisualBasic.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -29,6 +31,7 @@ namespace CyberNote.Services
             }
             catch
             {
+                Debug.WriteLine("Failed to read records from file.");
                 return new List<Record>();
             }
         }

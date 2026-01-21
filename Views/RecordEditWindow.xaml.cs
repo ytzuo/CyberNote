@@ -8,9 +8,9 @@ namespace CyberNote.Views
 {
     public partial class RecordEditWindow : Window
     {
-        private Record _record;
+        private readonly Record _record;
 
-        public MoodType SelectedMood => MoodCombo.SelectedItem as MoodType;
+        public MoodType? SelectedMood => MoodCombo.SelectedItem as MoodType;
         public string Comment => CommentBox.Text;
 
         public RecordEditWindow(Record record)

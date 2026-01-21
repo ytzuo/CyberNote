@@ -166,16 +166,24 @@ namespace CyberNote.ViewModels
             ThumbnailCardsView.Filter = FilterPredicate;
             SetSortDescriptions(); // 自定义方法设置 SortDescriptions 根据 CurrentSort 进行排序
 
-            // 构造函数不能是异步的，所以这里不能 await LoadCard()
-            // 我们可以启动一个不等待的任务，或者将 LoadCard 改回同步，或者在 Loaded 事件中调用
-            // 这里选择启动一个不等待的任务，并处理可能的异常
-            _ = LoadCardAsync();
+            // 统一进行异步初始化，并处理潜在异常
+            InitializeApp();
+        }
 
-            // 初始化热力图数据
-            _ = LoadHeatMapDataAsync();
+        private async void InitializeApp()
+        {
+            try
+            {
+                await LoadCardAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Error] LoadCardAsync failed: {ex}");
+            }
 
-            // 1. 启动时检查今日记录
-            _ = InitializeTodayRecordAsync();
+            // 下面两个方法内部已包含 try-catch，但为了保险起见，依然放在这里或者单独处理
+            await LoadHeatMapDataAsync();
+            await InitializeTodayRecordAsync();
         }
 
         public async Task InitializeTodayRecordAsync()
@@ -195,7 +203,7 @@ namespace CyberNote.ViewModels
 
         public async Task IncrementTodayCardCountAsync()
         {
-             try
+            try
             {
                 var rPath = ConfigService.RecordFilePath;
                 await RecordWriter.IncrementTodayCardCountAsync(rPath);
@@ -308,13 +316,32 @@ namespace CyberNote.ViewModels
             return "#216E39"; // 最深绿
         }
 
+        private async Task HandleHeatMapItemClickedAsync(HeatMapItemViewModel item)
+        {
+            if (item == null) return;
+            try
+            {
+                await OpenRecordEditDialogAsync(item);
+            }
+            catch (Exception ex)
+            {
+                // 捕获并记录异常，防止未处理异常导致应用程序崩溃
+                Debug.WriteLine($"Error while opening record edit dialog: {ex}");
+                System.Windows.MessageBox.Show(
+                    "打开记录编辑窗口时发生错误，请重试或查看日志获取更多信息。",
+                    "错误",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
         private void OnHeatMapItemClicked(HeatMapItemViewModel item)
         {
             if (item == null) return;
-            
+
             // 使用异步任务来执行，避免UI线程阻塞
             // 注意：MvvmLight relaycommand 是 void 委托，这里用 fire-and-forget
-            _ = OpenRecordEditDialogAsync(item);
+            _ = HandleHeatMapItemClickedAsync(item);
         }
 
         private async Task OpenRecordEditDialogAsync(HeatMapItemViewModel item)
@@ -326,7 +353,10 @@ namespace CyberNote.ViewModels
             {
                 records = await RecordReader.LoadAllRecordsAsync(rPath);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to load records from '{rPath}': {ex}");
+            }
 
             var dateOnly = DateOnly.FromDateTime(item.Date);
             var record = records.FirstOrDefault(r => r.Date == dateOnly);
@@ -383,35 +413,42 @@ namespace CyberNote.ViewModels
 
         private async Task LoadCardAsync()
         {
-            var path = DataFilePath;
-            if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
-            
-            //加载所有卡片存储的list
-            // JsonReader.LoadAllCard 目前是同步的，如果需要也可以改为异步
-            var cards = await Task.Run(() => JsonReader.LoadAllCard(path));
-            cards = SortNoteCards(cards);
-
-            var idSet = new HashSet<string>();
-            foreach (var card in cards)
+            try
             {
-                bool dup = !string.IsNullOrWhiteSpace(card.Id) && !idSet.Add(card.Id);
-                if (dup) Debug.WriteLine($"[警告] 发现重复 Id: {card.Id}");
-                var vm = new ThumbnailCardViewModel(card)
+                var path = DataFilePath;
+                if (!File.Exists(path)) { Debug.WriteLine("[Debug] JSON 文件不存在: " + path); return; }
+                
+                //加载所有卡片存储的list
+                // JsonReader.LoadAllCard 目前是同步的，如果需要也可以改为异步
+                var cards = await Task.Run(() => JsonReader.LoadAllCard(path));
+                cards = SortNoteCards(cards);
+
+                var idSet = new HashSet<string>();
+                foreach (var card in cards)
                 {
-                    Type = card.Type,
-                    CreateDate = card.createDate,
-                    Title = card.Title,
-                };
-                ThumbnailCards.Add(vm);
-            }
+                    bool dup = !string.IsNullOrWhiteSpace(card.Id) && !idSet.Add(card.Id);
+                    if (dup) Debug.WriteLine($"[警告] 发现重复 Id: {card.Id}");
+                    var vm = new ThumbnailCardViewModel(card)
+                    {
+                        Type = card.Type,
+                        CreateDate = card.createDate,
+                        Title = card.Title,
+                    };
+                    ThumbnailCards.Add(vm);
+                }
 
-            if (ThumbnailCards.Count == 0)
-            {
-                await ExecuteAddNewCard();
+                if (ThumbnailCards.Count == 0)
+                {
+                    await ExecuteAddNewCard();
+                }
+                ExecuteReplaceMainCard(ThumbnailCards.First());
+                // 初始化筛选后的列表
+                ApplyFilters();
             }
-            ExecuteReplaceMainCard(ThumbnailCards.First());
-            // 初始化筛选后的列表
-            ApplyFilters();
+            catch (Exception ex)
+            {
+                 Debug.WriteLine($"[Error] LoadCardAsync: {ex}");
+            }
         }
         
         // 排序选项（可扩展）

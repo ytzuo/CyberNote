@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace CyberNote.Services
@@ -160,7 +161,10 @@ namespace CyberNote.Services
                     if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
                     File.WriteAllText(path, "[]"); 
                 } 
-                catch { }
+                catch 
+                {
+                    Debug.WriteLine($"Failed to create file at {path}");
+                }
             }
         }
     }
