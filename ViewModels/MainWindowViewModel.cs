@@ -10,12 +10,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Shapes;
 
 namespace CyberNote.ViewModels
 {
@@ -26,6 +24,7 @@ namespace CyberNote.ViewModels
         
         // HeatMap 数据集合
         public ObservableCollection<HeatMapItemViewModel> HeatMapItems { get; } = new ObservableCollection<HeatMapItemViewModel>();
+        public ObservableCollection<string> HeatMapHeaders { get; } = new ObservableCollection<string>();
 
         public ICommand HeatMapItemClickCommand { get; }
 
@@ -94,6 +93,9 @@ namespace CyberNote.ViewModels
             ThumbnailCards.Insert(0, newCard);
             await JsonWriter.AppendNoteAsync(DataFilePath, note);
             
+            // 2. 增加计数
+            await IncrementTodayCardCountAsync();
+
             Debug.WriteLine($"AddNewCard: Title={newCard.Title}, ThumbnailCards.Count={ThumbnailCards.Count}");
         }
 
@@ -169,36 +171,141 @@ namespace CyberNote.ViewModels
             // 这里选择启动一个不等待的任务，并处理可能的异常
             _ = LoadCardAsync();
 
-            // 初始化热力图数据（预留逻辑）
-            InitializeHeatMapData();
+            // 初始化热力图数据
+            _ = LoadHeatMapDataAsync();
+
+            // 1. 启动时检查今日记录
+            _ = InitializeTodayRecordAsync();
         }
 
-        private void InitializeHeatMapData()
+        public async Task InitializeTodayRecordAsync()
         {
-            // TODO: 实现由数据生成 HeatMapItems 的逻辑
-            // 暂时生成模拟数据以展示 UI 效果
-            GenerateDummyHeatMapData(); 
-        }
-
-        private void GenerateDummyHeatMapData()
-        {
-            // 预留：生成不少于 7 列的数据
-            // 这里只是示例，具体逻辑请根据真实数据实现
-            var startDate = DateTime.Today.AddDays(-(7 * 10) + 1); // 10周前
-            // 调整到周一（如果需要）
-            
-            for (int i = 0; i < 7 * 10; i++)
+            try
             {
-                var date = startDate.AddDays(i);
-                HeatMapItems.Add(new HeatMapItemViewModel 
-                { 
-                    Date = date,
-                    Color = "#EBEDF0", // 默认颜色
-                    Count = 0,
-                    Mood = "😐",
-                    NoteSummary = "无记录"
+                var rPath = ConfigService.RecordFilePath;
+                await RecordWriter.EnsureTodayRecordAsync(rPath);
+                // 刷新热力图以显示今天的数据（即使是空）
+                await LoadHeatMapDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Error] InitializeTodayRecordAsync: {ex.Message}");
+            }
+        }
+
+        public async Task IncrementTodayCardCountAsync()
+        {
+             try
+            {
+                var rPath = ConfigService.RecordFilePath;
+                await RecordWriter.IncrementTodayCardCountAsync(rPath);
+                // 刷新热力图
+                await LoadHeatMapDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Error] IncrementTodayCardCountAsync: {ex.Message}");
+            }
+        }
+
+        private async Task LoadHeatMapDataAsync()
+        {
+            try
+            {
+                var rPath = ConfigService.RecordFilePath;
+                // 确保文件存在， RecordReader 内部已有判断，但为了安全
+                var records = await RecordReader.LoadAllRecordsAsync(rPath);
+                var recordDict = records.ToDictionary(r => r.Date);
+
+                int weeksToShow = 10; // 显示过去10周
+                var today = DateTime.Today;
+
+                // 计算本周一的日期
+                // DayOfWeek: Sunday=0, Monday=1, ..., Saturday=6
+                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                var currentWeekMonday = today.AddDays(-diff);
+
+                // 起始日期：倒推 weeksToShow - 1 周的周一
+                var startDate = currentWeekMonday.AddDays(-(weeksToShow - 1) * 7);
+
+                var items = new List<HeatMapItemViewModel>();
+                var headers = new List<string>();
+                int lastLabeledMonth = -1;
+
+                // 生成周表头
+                for (int w = 0; w < weeksToShow; w++)
+                {
+                    var weekMonday = startDate.AddDays(w * 7);
+                    var weekSunday = weekMonday.AddDays(6);
+                    string label = "";
+                    
+                    // 如果这周的周一和周日都在同一个月（即第一个整列属于同一个月）
+                    if (weekMonday.Month == weekSunday.Month)
+                    {
+                        // 如果这个月还没被标记过
+                        if (weekMonday.Month != lastLabeledMonth)
+                        {
+                            label = DateName.FromMonth(weekMonday.Month).Name;
+                            lastLabeledMonth = weekMonday.Month;
+                        }
+                    }
+                    headers.Add(label);
+                }
+
+                for (int i = 0; i < weeksToShow * 7; i++)
+                {
+                    var date = startDate.AddDays(i);
+                    var dateOnly = DateOnly.FromDateTime(date);
+
+                    var item = new HeatMapItemViewModel
+                    {
+                        Date = date,
+                        Color = "#EBEDF0", // 默认颜色
+                        Count = 0,
+                        Mood = MoodType.Unknown.Emoji,
+                        NoteSummary = "无记录"
+                    };
+
+                    if (recordDict.TryGetValue(dateOnly, out var record))
+                    {
+                        item.Count = record.CardCount;
+                        item.Mood = record.Mood?.Emoji ?? MoodType.Unknown.Emoji;
+                        item.NoteSummary = record.Comment;
+                        item.Color = GetColorForCount(record.CardCount);
+                    }
+
+                    items.Add(item);
+                }
+
+                // 需要在 UI 线程更新 ObservableCollection
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    HeatMapHeaders.Clear();
+                    foreach (var h in headers)
+                    {
+                        HeatMapHeaders.Add(h);
+                    }
+
+                    HeatMapItems.Clear();
+                    foreach (var item in items)
+                    {
+                        HeatMapItems.Add(item);
+                    }
                 });
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Error] LoadHeatMapDataAsync: {ex.Message}");
+            }
+        }
+
+        private string GetColorForCount(int count)
+        {
+            if (count == 0) return "#EBEDF0";
+            if (count <= 2) return "#9BE9A8"; // 浅绿
+            if (count <= 5) return "#40C463"; // 中绿
+            if (count <= 9) return "#30A14E"; // 深绿
+            return "#216E39"; // 最深绿
         }
 
         private void OnHeatMapItemClicked(HeatMapItemViewModel item)
@@ -239,30 +346,8 @@ namespace CyberNote.ViewModels
             ExecuteReplaceMainCard(ThumbnailCards.First());
             // 初始化筛选后的列表
             ApplyFilters();
-
-            // 调试：测试读取 records.json
-            //_ = TestReadRecordsAsync();
         }
-
-        private async Task TestReadRecordsAsync()
-        {
-            try
-            {
-                var rPath = ConfigService.RecordFilePath;
-                Debug.WriteLine($"[Debug] RecordFilePath: {rPath}");
-                var records = await RecordReader.LoadAllRecordsAsync(rPath);
-                Debug.WriteLine($"[Debug] Loaded {records.Count} records.");
-                foreach (var r in records)
-                {
-                    Debug.WriteLine($"[Debug] Record: {r.Date:yyyy-MM-dd} Mood={r.Mood.Name} Count={r.CardCount} Comment={r.Comment}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[Debug] Read records failed: {ex.Message}");
-            }
-        }
-
+        
         // 排序选项（可扩展）
         public enum SortOption
         {

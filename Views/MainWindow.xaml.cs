@@ -301,6 +301,9 @@ namespace CyberNote
             // 插入到正确位置（降序时在开头）
             vm.ThumbnailCards.Insert(0, newCard);
             await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
+
+            // 增加今日计数
+            await vm.IncrementTodayCardCountAsync();
             
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
@@ -325,6 +328,9 @@ namespace CyberNote
             // 插入到正确位置（降序时在开头）
             vm.ThumbnailCards.Insert(0, newCard);
             await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
+
+            // 增加今日计数
+            await vm.IncrementTodayCardCountAsync();
             
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
@@ -346,6 +352,9 @@ namespace CyberNote
             // 插入到正确位置（降序时在开头）
             vm.ThumbnailCards.Insert(0, newCard);
             await JsonWriter.AppendNoteAsync(vm.DataFilePath, note);
+
+            // 增加今日计数
+            await vm.IncrementTodayCardCountAsync();
 
             // 自动切换到新创建的卡片
             if (vm.ReplaceMainCard.CanExecute(newCard))
