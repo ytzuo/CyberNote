@@ -311,8 +311,74 @@ namespace CyberNote.ViewModels
         private void OnHeatMapItemClicked(HeatMapItemViewModel item)
         {
             if (item == null) return;
-            // TODO: 双击小方块后的逻辑，例如弹出添加心情/记录的窗口
-            Debug.WriteLine($"HeatMap Item Clicked: {item.Date}");
+            
+            // 使用异步任务来执行，避免UI线程阻塞
+            // 注意：MvvmLight relaycommand 是 void 委托，这里用 fire-and-forget
+            _ = OpenRecordEditDialogAsync(item);
+        }
+
+        private async Task OpenRecordEditDialogAsync(HeatMapItemViewModel item)
+        {
+            // 1. 从文件加载所有记录以找到准确的 Record 对象
+            var rPath = ConfigService.RecordFilePath;
+            List<Record> records = new List<Record>();
+            try
+            {
+                records = await RecordReader.LoadAllRecordsAsync(rPath);
+            }
+            catch { }
+
+            var dateOnly = DateOnly.FromDateTime(item.Date);
+            var record = records.FirstOrDefault(r => r.Date == dateOnly);
+
+            // 2. 如果不存在，创建一个新的（但不立即保存到文件，除非用户点击保存）
+            if (record == null)
+            {
+                record = new Record
+                {
+                    Date = dateOnly,
+                    Mood = MoodType.Unknown,
+                    CardCount = 0,
+                    Comment = ""
+                };
+            }
+
+            // 3. 在 UI 线程打开窗口
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                var dlg = new RecordEditWindow(record);
+                // 设置 owner 为主窗口（如果能获取到），或者居中
+                if (System.Windows.Application.Current.MainWindow != null)
+                {
+                    dlg.Owner = System.Windows.Application.Current.MainWindow;
+                }
+
+                if (dlg.ShowDialog() == true)
+                {
+                    // 用户点击了保存，更新 record 对象
+                    record.Mood = dlg.SelectedMood;
+                    record.Comment = dlg.Comment;
+
+                    // 4. 写回文件
+                    _ = SaveRecordAndReloadAsync(record);
+                }
+            });
+        }
+
+        private async Task SaveRecordAndReloadAsync(Record record)
+        {
+            try
+            {
+                var rPath = ConfigService.RecordFilePath;
+                await RecordWriter.SaveRecordAsync(rPath, record);
+                
+                // 刷新热力图
+                await LoadHeatMapDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Error] SaveRecordAndReloadAsync: {ex.Message}");
+            }
         }
 
         private async Task LoadCardAsync()
