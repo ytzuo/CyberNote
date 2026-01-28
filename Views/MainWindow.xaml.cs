@@ -348,6 +348,14 @@ namespace CyberNote
                 // 深色模式下的幽灵按钮：白色半透明
                 System.Windows.Application.Current.Resources["GhostButtonHoverBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x20, 255, 255, 255));
                 System.Windows.Application.Current.Resources["GhostButtonPressedBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 255, 255, 255));
+                
+                // Heatmap Colors for Dark Mode
+                // Use a slightly lighter grey for empty cells to distinguish them from the dark background
+                System.Windows.Application.Current.Resources["HeatMapEmptyBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x40, 0x40, 0x40)); 
+                System.Windows.Application.Current.Resources["HeatMapL1Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x0E, 0x44, 0x29)); 
+                System.Windows.Application.Current.Resources["HeatMapL2Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x00, 0x6D, 0x32));
+                System.Windows.Application.Current.Resources["HeatMapL3Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0xA6, 0x41));
+                System.Windows.Application.Current.Resources["HeatMapL4Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x39, 0xD3, 0x53));
             }
             else
             {
@@ -368,6 +376,13 @@ namespace CyberNote
                 // 浅色模式下的幽灵按钮：主题色半透明
                 System.Windows.Application.Current.Resources["GhostButtonHoverBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(30, theme.Primary.R, theme.Primary.G, theme.Primary.B));
                 System.Windows.Application.Current.Resources["GhostButtonPressedBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(60, theme.Primary.R, theme.Primary.G, theme.Primary.B));
+
+                // Heatmap Colors for Light Mode
+                System.Windows.Application.Current.Resources["HeatMapEmptyBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xEB, 0xED, 0xF0));
+                System.Windows.Application.Current.Resources["HeatMapL1Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x9B, 0xE9, 0xA8));
+                System.Windows.Application.Current.Resources["HeatMapL2Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x40, 0xC4, 0x63));
+                System.Windows.Application.Current.Resources["HeatMapL3Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x30, 0xA1, 0x4E));
+                System.Windows.Application.Current.Resources["HeatMapL4Brush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x21, 0x6E, 0x39));
             }
         }
 

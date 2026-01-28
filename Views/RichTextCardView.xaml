@@ -90,20 +90,20 @@
 
                 <TextBlock Grid.Column="0"
                            Text="{Binding createDate, StringFormat='{}{0:yyyy-MM-dd}'}"
-                           Foreground="#666666"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            FontSize="12"/>
                 
                 <!-- 编辑模式提示 -->
                 <TextBlock Grid.Column="1"
                            Text="Esc退出"
-                           Foreground="#4CAF50"
+                           Foreground="{DynamicResource PrimaryBrush}"
                            FontSize="10"
                            FontStyle="Italic"
                            Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"/>
             </Grid>
 
             <!-- 悬浮新增按钮 -->
-            <Button Grid.Row="1" Background="#4CAF50" 
+            <Button Grid.Row="1" Background="{DynamicResource PrimaryBrush}" 
                     Width="30" 
                     Height="30" 
                     BorderThickness="0"
@@ -122,10 +122,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#45A049"/>
+                                <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#3D8B40"/>
+                                <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

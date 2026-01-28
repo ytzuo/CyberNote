@@ -422,8 +422,8 @@
                StaysOpen="True" 
                IsOpen="False" 
                AllowsTransparency="True">
-            <Border Background="#FFFFFF" 
-                    BorderBrush="#DDDDDD" 
+            <Border Background="{DynamicResource PopupBackgroundBrush}" 
+                    BorderBrush="{DynamicResource BorderBrush}" 
                     BorderThickness="1" 
                     CornerRadius="8" 
                     Padding="8" 
@@ -439,7 +439,7 @@
                     </Grid.RowDefinitions>
                     
                     <!-- 提示标题 -->
-                    <TextBlock Grid.Row="0" Text="每日热力图" FontSize="10" Foreground="#999" Margin="2,0,0,4" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBlock Grid.Row="0" Text="每日热力图" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="2,0,0,4" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     
                     <!-- 月份表头 -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding HeatMapHeaders}" Margin="0,0,0,2">
@@ -451,7 +451,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid Width="16">
-                                    <TextBlock Text="{Binding}" FontSize="9" Foreground="#999" HorizontalAlignment="Left" Margin="0,0,-20,0"/>
+                                    <TextBlock Text="{Binding}" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Left" Margin="0,0,-20,0"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -466,7 +466,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="12" Height="12" Margin="2" Background="{Binding Color}" CornerRadius="2" ToolTipService.InitialShowDelay="0">
+                                <Border Width="12" Height="12" Margin="2" CornerRadius="2" ToolTipService.InitialShowDelay="0">
                                     <Border.InputBindings>
                                         <MouseBinding Gesture="LeftDoubleClick" 
                                                       Command="{Binding DataContext.HeatMapItemClickCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
@@ -474,7 +474,23 @@
                                     </Border.InputBindings>
                                     <Border.Style>
                                         <Style TargetType="Border">
+                                            <!-- Default background (Level 0) -->
+                                            <Setter Property="Background" Value="{DynamicResource HeatMapEmptyBrush}"/> 
                                             <Style.Triggers>
+                                                <!-- Level triggers for DynamicResource -->
+                                                <DataTrigger Binding="{Binding Level}" Value="1">
+                                                    <Setter Property="Background" Value="{DynamicResource HeatMapL1Brush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Level}" Value="2">
+                                                    <Setter Property="Background" Value="{DynamicResource HeatMapL2Brush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Level}" Value="3">
+                                                    <Setter Property="Background" Value="{DynamicResource HeatMapL3Brush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Level}" Value="4">
+                                                    <Setter Property="Background" Value="{DynamicResource HeatMapL4Brush}"/>
+                                                </DataTrigger>
+
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter Property="RenderTransform">
                                                         <Setter.Value>
@@ -482,26 +498,26 @@
                                                         </Setter.Value>
                                                     </Setter>
                                                     <Setter Property="Panel.ZIndex" Value="100"/>
-                                                    <Setter Property="BorderBrush" Value="#666"/>
+                                                    <Setter Property="Cursor" Value="Hand"/>
                                                     <Setter Property="BorderThickness" Value="1"/>
                                                 </Trigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
                                     <Border.ToolTip>
-                                        <ToolTip>
-                                            <StackPanel Margin="4">
-                                                <TextBlock Text="{Binding Date, StringFormat=yyyy-MM-dd}" FontWeight="Bold"/>
+                                        <ToolTip Background="{DynamicResource WindowBackgroundBrush}">
+                                            <StackPanel Margin="4" Background="{DynamicResource WindowBackgroundBrush}">
+                                                <TextBlock Text="{Binding Date, StringFormat=yyyy-MM-dd}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
                                                 <Separator Margin="0,4"/>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="便签: " Foreground="#666"/>
-                                                    <TextBlock Text="{Binding Count}"/>
+                                                <StackPanel Orientation="Horizontal" Background="{DynamicResource WindowBackgroundBrush}">
+                                                    <TextBlock Text="便签: " Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="{Binding Count}" Foreground="{DynamicResource TextPrimaryBrush}"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="心情: " Foreground="#666"/>
-                                                    <TextBlock Text="{Binding Mood}"/>
+                                                <StackPanel Orientation="Horizontal" Background="{DynamicResource WindowBackgroundBrush}">
+                                                    <TextBlock Text="心情: " Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="{Binding Mood}" Foreground="{DynamicResource TextPrimaryBrush}"/>
                                                 </StackPanel>
-                                                <TextBlock Text="{Binding NoteSummary}" Margin="0,4,0,0" FontStyle="Italic" MaxWidth="150" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding NoteSummary}" Margin="0,4,0,0" FontStyle="Italic" MaxWidth="150" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}"/>
                                             </StackPanel>
                                         </ToolTip>
                                     </Border.ToolTip>

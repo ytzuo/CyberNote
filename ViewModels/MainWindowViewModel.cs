@@ -270,6 +270,7 @@ namespace CyberNote.ViewModels
                         Date = date,
                         Color = "#EBEDF0", // 默认颜色
                         Count = 0,
+                        Level = 0,
                         Mood = MoodType.Unknown.Emoji,
                         NoteSummary = "无记录"
                     };
@@ -280,6 +281,7 @@ namespace CyberNote.ViewModels
                         item.Mood = record.Mood?.Emoji ?? MoodType.Unknown.Emoji;
                         item.NoteSummary = record.Comment;
                         item.Color = GetColorForCount(record.CardCount);
+                        item.Level = GetLevelForCount(record.CardCount);
                     }
 
                     items.Add(item);
@@ -305,6 +307,15 @@ namespace CyberNote.ViewModels
             {
                 Debug.WriteLine($"[Error] LoadHeatMapDataAsync: {ex.Message}");
             }
+        }
+
+        private int GetLevelForCount(int count)
+        {
+            if (count == 0) return 0;
+            if (count <= 2) return 1;
+            if (count <= 5) return 2;
+            if (count <= 9) return 3;
+            return 4;
         }
 
         private string GetColorForCount(int count)
@@ -576,6 +587,18 @@ namespace CyberNote.ViewModels
         public int Count { get; set; }
         public string Mood { get; set; } = "";
         public string NoteSummary { get; set; } = "";
+
+        // 添加 Level 属性，用于表示热力图的强度等级
+        private int _level = 0;
+        public int Level
+        {
+            get => _level;
+            set
+            {
+                _level = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Level)));
+            }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
     }

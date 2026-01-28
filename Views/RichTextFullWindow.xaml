@@ -15,9 +15,9 @@
         <Style x:Key="PrimaryButton" TargetType="Button">
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="Foreground" Value="#2C3E50"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -27,17 +27,17 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="BorderBrush" Value="#66C17A"/>
-                                <Setter TargetName="bd" Property="Background" Value="#F8FFFA"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource PrimaryHoverBrush}"/>
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource ActiveCardBackgroundBrush}"/>
                                 <Setter TargetName="bd" Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="#AA66C17A" BlurRadius="5" ShadowDepth="0" Opacity="0.6"/>
+                                        <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.1"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#E8F5E9"/>
-                                <Setter TargetName="bd" Property="BorderBrush" Value="#4CAF50"/>
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource GhostButtonPressedBrush}"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="bd" Property="Opacity" Value="0.6"/>
@@ -48,7 +48,7 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid Background="White">
+    <Grid Background="{DynamicResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -57,8 +57,15 @@
         <!-- 顶部栏 -->
         <DockPanel Grid.Row="0" Margin="10">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                <TextBlock Text="标题：" FontWeight="SemiBold" FontSize="22" VerticalAlignment="Center"/>
-                <TextBox Width="320" FontSize="22" Padding="10,6" BorderBrush="#CCCCCC" BorderThickness="1" FontWeight="Bold" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Text="标题：" FontWeight="SemiBold" FontSize="22" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBox Width="320" FontSize="22" Padding="10,6" 
+                         BorderBrush="{DynamicResource BorderBrush}" 
+                         BorderThickness="1" 
+                         FontWeight="Bold" 
+                         Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" 
+                         Background="{DynamicResource WindowBackgroundBrush}"
+                         Foreground="{DynamicResource TextPrimaryBrush}"
+                         CaretBrush="{DynamicResource TextPrimaryBrush}"/>
             </StackPanel>
 
             <!-- 中间只留固定间隙 -->
@@ -80,7 +87,8 @@
                                       Visibility="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}"
                                       IsToolBarVisible="False"
                                       VerticalScrollBarVisibility="Auto"
-                                      Background="White" />
+                                      Background="{DynamicResource WindowBackgroundBrush}"
+                                      Foreground="{DynamicResource TextPrimaryBrush}" />
 
             <!-- 编辑模式 -->
             <RichTextBox x:Name="Editor"
@@ -89,12 +97,15 @@
                          AcceptsReturn="True"
                          AcceptsTab="True"
                          BorderThickness="1"
-                         BorderBrush="#4CAF50"
+                         BorderBrush="{DynamicResource PrimaryBrush}"
                          FontSize="14"
-                         Padding="10" />
+                         Padding="10" 
+                         Background="{DynamicResource WindowBackgroundBrush}"
+                         Foreground="{DynamicResource TextPrimaryBrush}"
+                         CaretBrush="{DynamicResource TextPrimaryBrush}" />
         </Grid>
         <!-- 右下角帮助按钮 -->
-        <Button x:Name="InfoButton" Grid.Row="1" Background="#4CAF50" 
+        <Button x:Name="InfoButton" Grid.Row="1" Background="{DynamicResource PrimaryBrush}" 
                 Width="40" 
                 Height="40" 
                 BorderThickness="0"
@@ -113,10 +124,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#45A049"/>
+                            <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#3D8B40"/>
+                            <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -130,18 +141,18 @@
                Placement="Right"
                StaysOpen="True"
                AllowsTransparency="True">
-            <Border Background="#FFFFFF" BorderBrush="#4CAF50" BorderThickness="1" CornerRadius="8" Padding="12">
+            <Border Background="{DynamicResource WindowBackgroundBrush}" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
                 <Border.Effect>
-                    <DropShadowEffect Color="#AA66C17A" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                    <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
                 </Border.Effect>
                 <StackPanel MaxWidth="320">
-                    <TextBlock Text="富文本快捷键" FontWeight="Bold" FontSize="16"/>
-                    <TextBlock Text="· Ctrl + B：加粗" TextWrapping="Wrap" FontSize="15"/>
-                    <TextBlock Text="· Ctrl + I：斜体" TextWrapping="Wrap" FontSize="15"/>
-                    <TextBlock Text="· Ctrl + U：下划线" TextWrapping="Wrap" FontSize="15"/>
-                    <TextBlock Text="· Ctrl + Z / Ctrl + Y：撤销 / 重做" TextWrapping="Wrap" FontSize="15"/>
-                    <TextBlock Text="· Enter：换行；Tab：缩进；Shift+Tab：减少缩进" TextWrapping="Wrap" FontSize="15"/>
-                    <TextBlock Text="· Esc：退出编辑并保存" TextWrapping="Wrap" FontSize="15"/>
+                    <TextBlock Text="富文本快捷键" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="· Ctrl + B：加粗" TextWrapping="Wrap" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="· Ctrl + I：斜体" TextWrapping="Wrap" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="· Ctrl + U：下划线" TextWrapping="Wrap" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="· Ctrl + Z / Ctrl + Y：撤销 / 重做" TextWrapping="Wrap" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="· Enter：换行；Tab：缩进；Shift+Tab：减少缩进" TextWrapping="Wrap" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="· Esc：退出编辑并保存" TextWrapping="Wrap" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
                 </StackPanel>
             </Border>
         </Popup>
