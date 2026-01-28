@@ -4,6 +4,24 @@
              xmlns:local="clr-namespace:CyberNote"
              xmlns:converters="clr-namespace:CyberNote.Converters">
     <Application.Resources>
+        <!-- 主题颜色资源 (默认绿色，浅色模式) -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#4CAF50"/>
+        <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#45A049"/>
+        <SolidColorBrush x:Key="PrimaryPressedBrush" Color="#3D8B40"/>
+        
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="PopupBackgroundBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#333333"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#888888"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#DDDDDD"/>
+
+        <!-- Active Card Background (Default Light Greenish Gradient fallback or solid) -->
+        <SolidColorBrush x:Key="ActiveCardBackgroundBrush" Color="#F4FFF6"/>
+
+        <!-- Ghost Button Colors (浅色 hover/pressed) -->
+        <SolidColorBrush x:Key="GhostButtonHoverBrush" Color="#FFE8F5E9"/>
+        <SolidColorBrush x:Key="GhostButtonPressedBrush" Color="#FFC8E6C9"/>
+        
         <!-- 细窄滚动条样式（更明显，悬停仅改变颜色，颜色更浅以适配白色背景） -->
         <Style TargetType="ScrollBar" x:Key="ThinScrollBar">
             <Setter Property="Width" Value="16"/>

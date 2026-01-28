@@ -19,33 +19,26 @@
         <!-- 提供缺失的样式，避免 XAML 解析错误 -->
         <Style x:Key="ThumbnailDateStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="#666666" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         </Style>
 
         <Style x:Key="ThumbnailTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="#333333" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
 
         <!-- 激活状态边框样式触发器（保持尺寸不抖动：不再修改 BorderThickness） -->
         <Style x:Key="ThumbnailBorderStyle" TargetType="Border">
-            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                    <Setter Property="BorderBrush" Value="#4CAF50"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
                     <!-- 使用渐变背景突出选中而不改变尺寸 -->
-                    <Setter Property="Background">
-                        <Setter.Value>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="#F4FFF6" Offset="0"/>
-                                <GradientStop Color="#FFFFFF" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="Background" Value="{DynamicResource ActiveCardBackgroundBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -71,7 +64,8 @@
                     
                     <TextBlock Grid.Column="1"
                                Text="{Binding Type, Converter={StaticResource TypeConverter}}"
-                               HorizontalAlignment="Right"/>
+                               HorizontalAlignment="Right"
+                               Foreground="{DynamicResource TextSecondaryBrush}"/>
                 </Grid>
 
                 <!-- 标题（使用截断转换器，编辑时也会实时生效） -->
@@ -91,7 +85,7 @@
             <TextBlock Grid.Row="1"
                        Text="{Binding ListCompletionText}"
                        FontSize="11"
-                       Foreground="#4CAF50"
+                       Foreground="{DynamicResource PrimaryBrush}"
                        VerticalAlignment="Bottom"
                        HorizontalAlignment="Left"
                        Margin="0,4,0,0">
