@@ -31,8 +31,8 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
-      # 4. 单文件发布（自带运行时，不需要客户机装 .NET）
-      - name: Publish single-file
+      # 4. 发布（Self-Contained & Framework-Dependent）
+      - name: Publish Self-Contained
         run: |
           dotnet publish CyberNote.csproj `
             -c Release `
@@ -40,12 +40,22 @@ jobs:
             -p:PublishSingleFile=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `
             -r ${{ matrix.rid }} `
-            -o pub/${{ matrix.rid }}
+            -o pub/${{ matrix.rid }}-sc
 
-      # 5. 打成 zip（Windows 用 zip，其余用 tar）
+      - name: Publish Framework-Dependent
+        run: |
+          dotnet publish CyberNote.csproj `
+            -c Release `
+            --self-contained false `
+            -p:PublishSingleFile=true `
+            -r ${{ matrix.rid }} `
+            -o pub/${{ matrix.rid }}-fd
+
+      # 5. 打包
       - name: Package
         run: |
-          Compress-Archive -Path pub\win-x64\* -DestinationPath win-x64.zip
+          Compress-Archive -Path pub\${{ matrix.rid }}-sc\* -DestinationPath ${{ matrix.rid }}-self-contained.zip
+          Compress-Archive -Path pub\${{ matrix.rid }}-fd\* -DestinationPath ${{ matrix.rid }}-framework-dependent.zip
 
       # 6. 上传成品到 GitHub Release（自动创建标签）
       - name: Release
@@ -55,7 +65,7 @@ jobs:
           tag_name: v1 #固定为v1版本
           name: Release ${{ github.run_number }}
           files: |
-            ${{ matrix.rid }}.zip
-            ${{ matrix.rid }}.tar.gz
+            ${{ matrix.rid }}-self-contained.zip
+            ${{ matrix.rid }}-framework-dependent.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
