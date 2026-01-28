@@ -36,19 +36,19 @@ jobs:
         run: |
           dotnet publish CyberNote.csproj `
             -c Release `
-            --self-contained true `
+            -r ${{ matrix.rid }} `
+            -p:SelfContained=true `
             -p:PublishSingleFile=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `
-            -r ${{ matrix.rid }} `
             -o pub/${{ matrix.rid }}-sc
 
       - name: Publish Framework-Dependent
         run: |
           dotnet publish CyberNote.csproj `
             -c Release `
-            --self-contained false `
-            -p:PublishSingleFile=true `
             -r ${{ matrix.rid }} `
+            -p:SelfContained=false `
+            -p:PublishSingleFile=true `
             -o pub/${{ matrix.rid }}-fd
 
       # 5. 打包
