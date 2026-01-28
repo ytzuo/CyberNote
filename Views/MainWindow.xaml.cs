@@ -91,6 +91,14 @@ namespace CyberNote
             };
 
             SetAutoStart();
+
+            // Load theme from config
+            _currentThemeIndex = ConfigService.ThemeIndex;
+            _isDarkMode = ConfigService.IsDarkMode;
+            // Ensure index is within bounds
+            if (_currentThemeIndex < 0 || _currentThemeIndex >= _themes.Length) _currentThemeIndex = 0;
+            
+            UpdateThemeResources();
         }
 
         /// <summary>
@@ -282,6 +290,84 @@ namespace CyberNote
                     mvm.ReloadData();
                     OptionPopup.IsOpen = false;
                 }
+            }
+        }
+
+        private int _currentThemeIndex = 0;
+        private bool _isDarkMode = false;
+
+        // 色彩主题定义：每个主题包含 主色、悬停色、按下色
+        private readonly (System.Windows.Media.Color Primary, System.Windows.Media.Color Hover, System.Windows.Media.Color Pressed)[] _themes = new[]
+        {
+            (System.Windows.Media.Color.FromRgb(0x4C, 0xAF, 0x50), System.Windows.Media.Color.FromRgb(0x45, 0xA0, 0x49), System.Windows.Media.Color.FromRgb(0x3D, 0x8B, 0x40)), // Green
+            (System.Windows.Media.Color.FromRgb(0x21, 0x96, 0xF3), System.Windows.Media.Color.FromRgb(0x1E, 0x88, 0xE5), System.Windows.Media.Color.FromRgb(0x19, 0x76, 0xD2)), // Blue
+            (System.Windows.Media.Color.FromRgb(0xE9, 0x1E, 0x63), System.Windows.Media.Color.FromRgb(0xD8, 0x1B, 0x60), System.Windows.Media.Color.FromRgb(0xC2, 0x18, 0x5B)), // Pink
+            (System.Windows.Media.Color.FromRgb(0xFF, 0x98, 0x00), System.Windows.Media.Color.FromRgb(0xFB, 0x8C, 0x00), System.Windows.Media.Color.FromRgb(0xF5, 0x7C, 0x00)), // Orange
+            (System.Windows.Media.Color.FromRgb(0x9C, 0x27, 0xB0), System.Windows.Media.Color.FromRgb(0x8E, 0x24, 0xAA), System.Windows.Media.Color.FromRgb(0x7B, 0x1F, 0xA2))  // Purple
+        };
+
+        private void SwitchThemeButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentThemeIndex = (_currentThemeIndex + 1) % _themes.Length;
+            ConfigService.ThemeIndex = _currentThemeIndex;
+            UpdateThemeResources();
+        }
+
+        private void ToggleDayNightButton_Click(object sender, RoutedEventArgs e)
+        {
+            _isDarkMode = !_isDarkMode;
+            ConfigService.IsDarkMode = _isDarkMode;
+            UpdateThemeResources();
+        }
+
+        private void UpdateThemeResources()
+        {
+            var theme = _themes[_currentThemeIndex];
+
+            // 更新主题颜色资源
+            System.Windows.Application.Current.Resources["PrimaryBrush"] = new System.Windows.Media.SolidColorBrush(theme.Primary);
+            System.Windows.Application.Current.Resources["PrimaryHoverBrush"] = new System.Windows.Media.SolidColorBrush(theme.Hover);
+            System.Windows.Application.Current.Resources["PrimaryPressedBrush"] = new System.Windows.Media.SolidColorBrush(theme.Pressed);
+
+            if (_isDarkMode)
+            {
+                // 深色模式
+                System.Windows.Application.Current.Resources["WindowBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x20, 0x20, 0x20));
+                System.Windows.Application.Current.Resources["PopupBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x2D, 0x2D, 0x2D));
+                System.Windows.Application.Current.Resources["TextPrimaryBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xE0, 0xE0, 0xE0));
+                System.Windows.Application.Current.Resources["TextSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xAA, 0xAA, 0xAA));
+                System.Windows.Application.Current.Resources["BorderBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x44, 0x44, 0x44));
+
+                // 主要卡片激活背景：深色调的主题色
+                var activeColor = System.Windows.Media.Color.FromRgb(
+                    (byte)Math.Min(0x2D + theme.Primary.R / 10, 255), 
+                    (byte)Math.Min(0x2D + theme.Primary.G / 10, 255), 
+                    (byte)Math.Min(0x2D + theme.Primary.B / 10, 255));
+                System.Windows.Application.Current.Resources["ActiveCardBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(activeColor);
+
+                // 深色模式下的幽灵按钮：白色半透明
+                System.Windows.Application.Current.Resources["GhostButtonHoverBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x20, 255, 255, 255));
+                System.Windows.Application.Current.Resources["GhostButtonPressedBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 255, 255, 255));
+            }
+            else
+            {
+                // 浅色模式
+                System.Windows.Application.Current.Resources["WindowBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
+                System.Windows.Application.Current.Resources["PopupBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
+                System.Windows.Application.Current.Resources["TextPrimaryBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x33, 0x33, 0x33));
+                System.Windows.Application.Current.Resources["TextSecondaryBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x88, 0x88, 0x88));
+                System.Windows.Application.Current.Resources["BorderBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xDD, 0xDD, 0xDD));
+
+                // 主要卡片激活背景：浅色调的主题色
+                var activeColor = System.Windows.Media.Color.FromRgb(
+                    (byte)Math.Min(255, 240 + theme.Primary.R / 15),
+                    (byte)Math.Min(255, 240 + theme.Primary.G / 15),
+                    (byte)Math.Min(255, 240 + theme.Primary.B / 15));
+                System.Windows.Application.Current.Resources["ActiveCardBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(activeColor);
+
+                // 浅色模式下的幽灵按钮：主题色半透明
+                System.Windows.Application.Current.Resources["GhostButtonHoverBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(30, theme.Primary.R, theme.Primary.G, theme.Primary.B));
+                System.Windows.Application.Current.Resources["GhostButtonPressedBrush"] = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(60, theme.Primary.R, theme.Primary.G, theme.Primary.B));
             }
         }
 

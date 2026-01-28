@@ -11,7 +11,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     
-    <Border Background="White" Padding="12" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
+    <Border Background="{DynamicResource WindowBackgroundBrush}" Padding="12" CornerRadius="8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -25,7 +25,7 @@
                        Text="{Binding Title}"
                        FontSize="18"
                        FontWeight="SemiBold"
-                       Foreground="#2C3E50"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
                        TextTrimming="CharacterEllipsis"
                        MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
                        Cursor="Hand"
@@ -36,14 +36,15 @@
                      Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                      FontSize="18"
                      FontWeight="SemiBold"
-                     Foreground="#2C3E50"
-                     BorderBrush="#4CAF50"
+                     Foreground="{DynamicResource TextPrimaryBrush}"
+                     BorderBrush="{DynamicResource PrimaryBrush}"
                      BorderThickness="0,0,0,2"
                      Background="Transparent"
                      LostFocus="EditElement_LostFocus"
                      KeyDown="EditElement_KeyDown"
                      Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"
-                     x:Name="TitleTextBox"/>
+                     x:Name="TitleTextBox"
+                     CaretBrush="{DynamicResource TextPrimaryBrush}"/>
 
             <!-- 中间：正文，支持上下滚动 -->
             <!-- 查看模式 -->
@@ -54,7 +55,7 @@
                           Visibility="{Binding IsViewMode, ElementName=Root, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="{Binding Content}"
                            TextWrapping="Wrap"
-                           Foreground="#333333"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
                            FontSize="14"
                            MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
                            Cursor="Hand"/>
@@ -67,9 +68,11 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Auto"
-                     Foreground="#333333"
+                     Foreground="{DynamicResource TextPrimaryBrush}"
+                     CaretBrush="{DynamicResource TextPrimaryBrush}"
+                     Background="Transparent"
                      FontSize="14"
-                     BorderBrush="#4CAF50"
+                     BorderBrush="{DynamicResource PrimaryBrush}"
                      BorderThickness="1"
                      Padding="4"
                      LostFocus="EditElement_LostFocus"

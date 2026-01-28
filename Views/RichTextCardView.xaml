@@ -12,7 +12,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     
-    <Border Background="White" Padding="12" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
+    <Border Background="{DynamicResource WindowBackgroundBrush}" Padding="12" CornerRadius="8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -26,7 +26,7 @@
                        Text="{Binding Title}"
                        FontSize="18"
                        FontWeight="SemiBold"
-                       Foreground="#2C3E50"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
                        TextTrimming="CharacterEllipsis"
                        MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
                        Cursor="Hand"
@@ -36,15 +36,16 @@
             <TextBox Grid.Row="0"
                      Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                      FontSize="18"
-                     FontWeight="SemiBold"
-                     Foreground="#2C3E50"
-                     BorderBrush="#4CAF50"
-                     BorderThickness="0,0,0,2"
+                      FontWeight="SemiBold"
+                      Foreground="{DynamicResource TextPrimaryBrush}"
+                      BorderBrush="{DynamicResource PrimaryBrush}"
+                      BorderThickness="0,0,0,2"
                      Background="Transparent"
                      LostFocus="EditElement_LostFocus"
                      KeyDown="EditElement_KeyDown"
-                     Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"
-                     x:Name="TitleTextBox"/>
+                      Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"
+                      x:Name="TitleTextBox"
+                      CaretBrush="{DynamicResource TextPrimaryBrush}"/>
 
             <!-- 中间：富文本编辑器 -->
             <!-- 查看模式 -->
@@ -57,6 +58,7 @@
                                           IsToolBarVisible="False"
                                           VerticalScrollBarVisibility="Disabled"
                                           Background="Transparent"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
                                           MouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
                                           PreviewMouseLeftButtonDown="ViewElement_MouseLeftButtonDown"
                                           Cursor="Hand"/>
@@ -67,9 +69,12 @@
                          x:Name="ContentEditor"
                          Margin="0,8,0,8"
                          VerticalScrollBarVisibility="Auto"
-                         BorderBrush="#4CAF50"
+                         BorderBrush="{DynamicResource PrimaryBrush}"
                          BorderThickness="1"
                          Padding="4"
+                         Background="Transparent"
+                         Foreground="{DynamicResource TextPrimaryBrush}"
+                         CaretBrush="{DynamicResource TextPrimaryBrush}"
                          LostFocus="EditElement_LostFocus"
                          KeyDown="EditElement_KeyDown"
                          Visibility="{Binding IsEditMode, ElementName=Root, Converter={StaticResource BoolToVis}}"

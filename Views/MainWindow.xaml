@@ -21,7 +21,7 @@
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="4,2"/>
-            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -31,10 +31,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FFE8F5E9"/>
+                                <Setter Property="Background" Value="{DynamicResource GhostButtonHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#FFC8E6C9"/>
+                                <Setter Property="Background" Value="{DynamicResource GhostButtonPressedBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="#999"/>
@@ -69,7 +69,7 @@
         <Grid.Clip>
             <RectangleGeometry RadiusX="12" RadiusY="12" Rect="0,0,350,250" />
         </Grid.Clip>
-        <Border CornerRadius="12" BorderThickness="2" BorderBrush="#DDDDDD" Background="#FFFFFF" Padding="8" MouseLeftButtonDown="DragBorder_MouseLeftButtonDown" SnapsToDevicePixels="True" ClipToBounds="True">
+        <Border CornerRadius="12" BorderThickness="2" BorderBrush="{DynamicResource BorderBrush}" Background="{DynamicResource WindowBackgroundBrush}" Padding="8" MouseLeftButtonDown="DragBorder_MouseLeftButtonDown" SnapsToDevicePixels="True" ClipToBounds="True">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -82,7 +82,7 @@
 
         <!-- ✅ 用 Popup 实现"外部更宽面板" -->
         <Popup x:Name="WidePopup" Placement="Bottom" PlacementTarget="{Binding ElementName=ExpendBtn}" VerticalOffset="5" StaysOpen="True" IsOpen="False" AllowsTransparency="True">
-            <Border Background="#FFFFFF" BorderBrush="#DDDDDD" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True" MaxHeight="400">
+            <Border Background="{DynamicResource WindowBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="2" CornerRadius="12" Padding="10" SnapsToDevicePixels="True" MaxHeight="400">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -98,17 +98,19 @@
                         </Grid.ColumnDefinitions>
                         
                         <!-- 搜索框 -->
-                        <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4" Background="#FAFAFA" Margin="0,0,0,0">
+                        <Border Grid.Column="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Background="{DynamicResource WindowBackgroundBrush}" Margin="0,0,0,0">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🔍" FontSize="14" VerticalAlignment="Center" Margin="6,0,4,0" Foreground="#888"/>
+                                <TextBlock Grid.Column="0" Text="🔍" FontSize="14" VerticalAlignment="Center" Margin="6,0,4,0" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                 <TextBox x:Name="SearchBox" 
                                          Grid.Column="1" 
                                          BorderThickness="0" 
                                          Background="Transparent" 
+                                         Foreground="{DynamicResource TextPrimaryBrush}"
+                                         CaretBrush="{DynamicResource TextPrimaryBrush}"
                                          VerticalAlignment="Center" 
                                          FontSize="13" 
                                          Padding="4,6"
@@ -185,7 +187,7 @@
                     </ScrollViewer>
 
                     <!-- 悬浮新增按钮 -->
-                    <Button Grid.Row="1" Background="#4CAF50" 
+                    <Button Grid.Row="1" Background="{DynamicResource PrimaryBrush}" 
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
@@ -204,10 +206,10 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#45A049"/>
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#3D8B40"/>
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -216,7 +218,7 @@
                     </Button>
 
                     <!-- 悬浮设置按钮 -->
-                    <Button Grid.Row="1" Background="#4CAF50" 
+                    <Button Grid.Row="1" Background="{DynamicResource PrimaryBrush}" 
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
@@ -235,10 +237,10 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#45A049"/>
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#3D8B40"/>
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -247,7 +249,7 @@
                     </Button>
 
                     <!-- 悬浮动态按钮 -->
-                    <Button Grid.Row="1" Background="#4CAF50" 
+                    <Button Grid.Row="1" Background="{DynamicResource PrimaryBrush}" 
                             Width="40" 
                             Height="40" 
                             BorderThickness="0"
@@ -266,10 +268,10 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#45A049"/>
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#3D8B40"/>
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -356,8 +358,8 @@
             StaysOpen="False" 
             IsOpen="False" 
             AllowsTransparency="True">
-                <Border Background="#FFFFFF" 
-                    BorderBrush="#4CAF50" 
+                <Border Background="{DynamicResource PopupBackgroundBrush}" 
+                    BorderBrush="{DynamicResource PrimaryBrush}" 
                     BorderThickness="2" 
                     CornerRadius="8" 
                     Padding="12" 
@@ -372,7 +374,7 @@
                         <TextBlock Text="选项" 
                             FontWeight="Bold" 
                             FontSize="14" 
-                            Foreground="#333" 
+                            Foreground="{DynamicResource TextPrimaryBrush}" 
                             Margin="0,0,0,10"/>
 
                         <!-- 修改文件路径 -->
@@ -380,11 +382,31 @@
                                 Height="40"
                                 Tag="List"
                                 Click="ChangePathButton_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📄" FontSize="18" Margin="0,0,8,0"/>
-                            <TextBlock Text="修改便签文件路径" FontSize="14" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📄" FontSize="18" Margin="0,0,8,0"/>
+                                <TextBlock Text="修改便签文件路径" FontSize="14" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 切换主题 -->
+                        <Button Style="{StaticResource FlatButton}" 
+                                Height="40"
+                                Click="SwitchThemeButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🎨" FontSize="18" Margin="0,0,8,0"/>
+                                <TextBlock Text="切换颜色主题" FontSize="14" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- 切换昼夜模式 -->
+                        <Button Style="{StaticResource FlatButton}" 
+                                Height="40"
+                                Click="ToggleDayNightButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🌓" FontSize="18" Margin="0,0,8,0"/>
+                                <TextBlock Text="切换昼夜模式" FontSize="14" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
                 </StackPanel>
             </Border>
